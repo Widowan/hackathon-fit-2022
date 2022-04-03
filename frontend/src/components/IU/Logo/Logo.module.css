@@ -1,0 +1,8 @@
+.logo{
+    width: min(45px, 100%);
+    height: min(45px, 100%);
+}
+
+.logo img{
+    width: 100%;
+}

@@ -1,9 +1,13 @@
-import './App.css';
+import React from "react";
+import Header from "./components/semantics/Header/Header";
+import "./App.css"
+import IndexPage from "./components/Pages/IndexPage/IndexPage";
 
 function App() {
   return (
     <div className="App">
-      привет, мир!
+        <Header></Header>
+        <IndexPage/>
     </div>
   );
 }

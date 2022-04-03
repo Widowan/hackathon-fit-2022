@@ -1,0 +1,11 @@
+.inputOne{
+    background: #FFFFFF;
+    border: 1px solid #78AEFF;
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 2%;
+
+    font-size: max(0.9vw, 10pt);
+
+    width: 100%;
+}

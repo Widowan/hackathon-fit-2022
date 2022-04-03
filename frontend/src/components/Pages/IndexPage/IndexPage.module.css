@@ -1,0 +1,123 @@
+
+
+.indexPage{
+    margin-top: 60px;
+    font-family: 'Intro Script R';
+
+    padding: 0 max(2%, 10px) 0 max(2%, 10px);
+
+    display: flex;
+}
+
+.desktopContent{
+    width: 60%;
+}
+
+.text{
+
+}
+
+.textContent{
+
+    font-size: max(2.1vw, 24pt);
+
+}
+
+
+
+.textEnd{
+    color: #808FC9;
+
+    text-indent: 19%;
+}
+.textStart{
+    color: #C592A7;
+}
+
+.petals{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 40%;
+}
+
+.fone{
+    margin-top: 95px;
+    width: 100%;
+
+    display: flex;
+    justify-content: right;
+}
+
+.fone img{
+    width: 1028px;
+    /*width: 85%;*/
+}
+
+.permanentContent{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 40%;
+}
+
+.conceptText{
+    text-align: center;
+
+    font-size: max(2.1vw, 20pt);
+    color: #7889C5;
+}
+
+.conceptText span{
+    color: #7AC85F;
+}
+.conceptText span2{
+    color: #C592A7;
+}
+
+.infoText{
+    width: 100%;
+    text-align: center;
+    margin-top: 70px ;
+    font-size: max(1.5vw, 14pt);
+    font-family: 'Intro Script R';
+    font-style: normal;
+
+    line-height: 100.5%;
+    /* or 40px */
+
+
+    color: #46AB9F;
+}
+
+.str2{
+    margin-top: 2%;
+    text-indent: 10%;
+    color: #7DC48C;
+}
+
+.str2 span{
+    color: #8264FB;
+}
+
+.str3{
+    margin-top: 2%;
+    text-indent: 25%;
+    color: #7DC48C;
+}
+
+
+@media (max-width: 1130px) {
+    .desktopContent{
+        display: none;
+    }
+
+    .indexPage{
+        justify-content: center;
+    }
+
+    .permanentContent{
+        width: 100%;
+    }
+}

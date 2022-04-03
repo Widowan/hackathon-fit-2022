@@ -1,0 +1,65 @@
+
+
+.regForm{
+    font-family: 'Intro Regular';
+
+    margin-top: 4.5vw;
+
+    color: #618FD4;
+
+    width: max(55%,290px);
+
+    background: #FFFFFF;
+    border: 2px solid #7DCC40;
+    box-sizing: border-box;
+    border-radius: 8px;
+
+    padding: 3%;
+}
+
+.link{
+    min-width: 16pt;
+    text-decoration: underline;
+    text-align: end;
+}
+
+.titel{
+    margin-top: 25px;
+    font-size: max(2.3vw, 20pt);
+    text-align: center;
+}
+
+.margen{
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.razdelitel{
+    margin-top: 10px;
+}
+
+.button{
+    background: #02D731;
+    border-radius: 5px;
+    border: 0;
+    padding: 2% 5%;
+
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+    text-align: center;
+
+    color: #FFFFFF;
+
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.centr{
+    display: flex;
+    justify-content: center;
+
+    margin-top: 10%;
+    margin-bottom: 5%;
+}

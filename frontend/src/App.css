@@ -1,0 +1,13 @@
+body{
+    margin: 0;
+}
+
+@font-face {
+    font-family: 'Intro Script R';
+    src: url("./fonts/introscriptr_h2base.otf");
+}
+
+@font-face {
+    font-family: 'Intro Regular';
+    src: url("fonts/Inter-Regular.otf");
+}

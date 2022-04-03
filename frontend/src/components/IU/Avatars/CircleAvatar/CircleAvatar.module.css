@@ -1,0 +1,11 @@
+.avatar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(45px, 100%);
+    height: min(45px, 100%);
+}
+
+.avatar img{
+    width: 100%;
+}
