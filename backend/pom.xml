@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.hypnotoad.hackathon.fit2022</groupId>
 	<artifactId>backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.5</version>
 	<name>backend</name>
 	<description>FIT 2022 Hackathon backend</description>
 	<properties>
