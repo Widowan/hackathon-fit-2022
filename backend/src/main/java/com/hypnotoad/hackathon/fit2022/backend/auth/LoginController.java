@@ -61,7 +61,7 @@ public class LoginController {
         var valid = userRepository.validatePasswordHashByUsername(username, password_hash);
         if (!valid) {
             log.debug("User's credentials are invalid");
-            return ResponseEntity.status(401).body(new FailResponse("Invalid Credentials"));
+            return ResponseEntity.status(403).body(new FailResponse("Invalid credentials"));
         }
 
         userPrimitiveTokensRepository.deleteTokenByUser(user);
@@ -113,7 +113,7 @@ public class LoginController {
         var unique = userRepository.findByUsername(username);
         if (unique != null) {
             log.debug("Username is not unique");
-            return ResponseEntity.status(403).body(new FailResponse("Username is not unique"));
+            return ResponseEntity.status(401).body(new FailResponse("Username is not unique"));
         }
 
         return ResponseEntity.status(200).body(new SuccessResponse("Username is unique"));
