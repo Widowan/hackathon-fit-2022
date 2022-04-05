@@ -15,11 +15,15 @@
     font-family:  Arial;
 }
 
-.info{
+.info, .menu, .infoBlur{
     width: min(120px, 40%);
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.infoBlur{
+    filter: blur(5px);
 }
 
 

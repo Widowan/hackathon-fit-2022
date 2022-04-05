@@ -1,0 +1,62 @@
+.desktopMenu svg{
+    transform: translate(0,32px);
+    /*width: 10%;*/
+}
+
+.svg{
+    width: 100%;
+    display: flex;
+}
+
+.desktopMenu{
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 3px solid #5CCE67;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    padding: 32px 0px;
+
+    width: clamp(240px, 20vw ,320px);
+    max-height: 460px ;
+
+    z-index: 999;
+
+
+    /*transition-duration: 0.5s;*/
+}
+
+.desktopMenu .link, .startLink, .endLink{
+    text-decoration: none;
+    color: #525A9E;
+
+    font-family: 'Intro Script R';
+    font-size: clamp(24px,2vw,32px);
+    width: 90%;
+    text-align: center;
+
+    border: #5CCE67 solid;
+    border-width: 0 0 2px 0;
+
+    margin-top: clamp(32px,2.5vw,42px);
+}
+
+.startLink{
+
+    width: 70%;
+    margin: 0;
+}
+
+.endLink{
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1023px) {
+    .desktopMenu{
+        display: none;
+    }
+}

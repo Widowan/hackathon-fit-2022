@@ -1,5 +1,6 @@
 body{
     margin: 0;
+    overflow-x:hidden;
 }
 
 @font-face {
@@ -10,4 +11,9 @@ body{
 @font-face {
     font-family: 'Intro Regular';
     src: url("fonts/Inter-Regular.otf");
+}
+
+@font-face {
+    font-family: 'Intro Light';
+    src: url("fonts/Inter-Light.otf");
 }

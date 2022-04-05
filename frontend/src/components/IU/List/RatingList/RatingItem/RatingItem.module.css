@@ -1,0 +1,12 @@
+.ratingItem{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    max-width: 420px;
+
+    margin-top: 10px;
+
+    font-family: "Intro Script R";
+    font-size: 32px;
+}
