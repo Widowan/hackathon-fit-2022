@@ -3,6 +3,8 @@ package com.hypnotoad.hackathon.fit2022.backend.auth;
 import com.hypnotoad.hackathon.fit2022.backend.auth.password.PasswordHasher;
 import com.hypnotoad.hackathon.fit2022.backend.auth.token.UserPrimitiveTokensRepository;
 import com.hypnotoad.hackathon.fit2022.backend.responses.*;
+import com.hypnotoad.hackathon.fit2022.backend.responses.auth.AuthResponse;
+import com.hypnotoad.hackathon.fit2022.backend.responses.auth.GetMeResponse;
 import com.hypnotoad.hackathon.fit2022.backend.users.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
