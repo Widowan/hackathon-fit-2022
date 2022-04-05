@@ -12,8 +12,9 @@ CREATE TABLE IF NOT EXISTS UserTokens(
 );
 CREATE TABLE IF NOT EXISTS Games(
     id          SERIAL PRIMARY KEY,
-    name        TEXT NOT NULL,
-    description TEXT NOT NULL
+    name        TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    rules       TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS GameResults(
     id           SERIAL PRIMARY KEY,

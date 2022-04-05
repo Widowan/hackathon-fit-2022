@@ -1,5 +1,6 @@
-package com.hypnotoad.hackathon.fit2022.backend.responses;
+package com.hypnotoad.hackathon.fit2022.backend.responses.auth;
 
+import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.users.User;
 
 public class GetMeResponse extends Response {

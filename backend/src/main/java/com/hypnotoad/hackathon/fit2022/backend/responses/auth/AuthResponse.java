@@ -1,4 +1,6 @@
-package com.hypnotoad.hackathon.fit2022.backend.responses;
+package com.hypnotoad.hackathon.fit2022.backend.responses.auth;
+
+import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 
 public class AuthResponse extends Response {
     private String token;
