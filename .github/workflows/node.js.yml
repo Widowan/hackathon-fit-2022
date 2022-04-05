@@ -19,6 +19,10 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
+    defaults:
+      run:
+        working-directory: frontend
+
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -26,15 +30,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: |
-        cd frontend
-        npm ci
-    - run: |
-        cd frontend
-        npm run build --if-present
-    - run: |
-        cd frontend
-        npm test
+        cache-dependency-path: frontend/package-lock.json
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.0.0
       with:
