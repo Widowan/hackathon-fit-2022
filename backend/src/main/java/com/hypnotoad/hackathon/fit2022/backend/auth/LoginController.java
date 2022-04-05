@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +23,7 @@ public class LoginController {
     static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @GetMapping("/api/signUp")
+    @PostMapping("/api/signUp")
     public ResponseEntity<Response> signUp(
             @RequestParam String username,
             @RequestParam String password
@@ -47,6 +49,7 @@ public class LoginController {
     }
 
     @GetMapping("/api/signIn")
+    @PostMapping("/api/signIn")
     public ResponseEntity<Response> signIn(
             @RequestParam String username,
             @RequestParam String password
