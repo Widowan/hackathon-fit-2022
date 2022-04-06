@@ -134,6 +134,32 @@ public class LoginController {
         return ResponseEntity.status(200).body(new SuccessResponse("Username is unique"));
     }
 
+    // SECURITY: This is basically waiting to be hacked even with sanitizing
+    @GetMapping("/api/setAvatar")
+    public ResponseEntity<Response> setAvatar(@RequestParam String token, @RequestParam String avatar) {
+        log.debug("setAvatar issued with token {} and avatar {}", token, avatar);
+
+        var valid = userPrimitiveTokensRepository.validateToken(token);
+        if (!valid) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
+
+        if (avatar.isBlank()) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
+
+        var user = userRepository.findByToken(token);
+        var success = userRepository.setAvatarByUserId(user.getId(), avatar);
+
+        if (!success) {
+            return ResponseEntity.status(500).body(new FailResponse("Something went wrong"));
+        }
+
+        return ResponseEntity.status(200).body(new SuccessResponse("Success"));
+    }
+
     public LoginController(
             UserRepository userRepository,
             PasswordHasher passwordHasher,

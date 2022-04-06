@@ -78,4 +78,14 @@ public class UserRepository {
 
         return false;
     }
+
+    public boolean setAvatarByUserId(int id, String avatar) {
+        var sql = "UPDATE Users SET avatar = '?' WHERE id = ?";
+
+        try {
+            return jdbc.update(sql, avatar, id) > 0;
+        } catch (DataAccessException ignored) {}
+
+        return false;
+    }
 }

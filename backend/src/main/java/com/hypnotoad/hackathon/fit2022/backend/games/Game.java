@@ -5,6 +5,7 @@ public class Game {
     private String name;
     private String description;
     private String rules;
+    private String icon;
 
     public int getId() {
         return id;
@@ -36,5 +37,13 @@ public class Game {
 
     public void setRules(String rules) {
         this.rules = rules;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }
