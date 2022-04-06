@@ -141,8 +141,8 @@ public class LoginController {
 
         var valid = userPrimitiveTokensRepository.validateToken(token);
         if (!valid) {
-            log.debug("Empty fields are not allowed");
-            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+            log.debug("Provided token is invalid");
+            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
 
         if (avatar.isBlank()) {
