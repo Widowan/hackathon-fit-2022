@@ -4,6 +4,7 @@ import PageTitle from "../../IU/Text/PageTitle/PageTitle";
 import {useNavigate, useParams} from "react-router-dom";
 import DescriptionMobile from "./DescriptionMobaile/DescriptionMobile";
 import ModalRating from "../../ModalWindows/ModalRating/ModalRating";
+import GameOne from "../../Games/GameOne/GameOne";
 
 const GamePage = () => {
 
@@ -43,7 +44,7 @@ const GamePage = () => {
 
                 </div>
                 <div className={classes.game}>
-
+                    <GameOne/>
                 </div>
                 <div className={classes.status}>
                     <div className={classes.descriptionTitle}>Статус</div>

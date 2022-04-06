@@ -5,10 +5,12 @@ import DesktopMenu from "../../IU/Menu/DesktopMenu/DesktopMenu";
 import GamesList from "../../IU/List/GamesList/GamesList";
 
 const GamesPage = () => {
+
+
     return (
         <div className={classes.gamesPage}>
 
-            <PageTitle text="Игры / Тренажоры"/>
+            <PageTitle text="Игры / Тренажёры"/>
 
             <div className={classes.content}>
                 <DesktopMenu/>

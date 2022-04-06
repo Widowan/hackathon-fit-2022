@@ -50,4 +50,18 @@ export default class Service {
             return false
         }
     }
+
+    static async getAllGames(){
+
+        try {
+            const response = await Api.getAllGames();
+
+            return response.data;
+
+        }catch (error){
+            return false
+        }
+    }
+
+
 }

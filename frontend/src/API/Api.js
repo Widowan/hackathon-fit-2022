@@ -25,5 +25,10 @@ export default class Api {
   const response = await axios.get(serves.domen()+"signOut?token="+localStorage.getItem('token'));
   return response;
  }
+
+ static async getAllGames(){
+  const response = await axios.get(serves.domen()+"getAllGames");
+  return response;
+ }
 }
 
