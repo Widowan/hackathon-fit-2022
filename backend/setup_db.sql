@@ -2,7 +2,8 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS Users(
     id            SERIAL PRIMARY KEY,
     username      VARCHAR(64) NOT NULL UNIQUE,
-    password_hash CHAR(128)   NOT NULL
+    password_hash CHAR(128)   NOT NULL,
+    avatar        TEXT            NULL DEFAULT 'avatar1.svg'
 );
 CREATE TABLE IF NOT EXISTS UserTokens(
     user_id     INTEGER  NOT NULL,

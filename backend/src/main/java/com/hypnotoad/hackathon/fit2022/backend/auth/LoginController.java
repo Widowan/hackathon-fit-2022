@@ -30,6 +30,11 @@ public class LoginController {
     ) {
         log.debug("signUp issued by user {}", username);
 
+        if (username.isBlank() || password.isBlank()) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
+
         var exists = userRepository.findByUsername(username);
         if (exists != null) {
             log.debug("Such user already exists");
@@ -55,6 +60,11 @@ public class LoginController {
             @RequestParam String password
     ) {
         log.debug("signIn issued by user {}", username);
+
+        if (username.isBlank() || password.isBlank()) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
 
         var user = userRepository.findByUsername(username);
         if (user == null) {
@@ -127,7 +137,8 @@ public class LoginController {
     public LoginController(
             UserRepository userRepository,
             PasswordHasher passwordHasher,
-            UserPrimitiveTokensRepository userPrimitiveTokensRepository) {
+            UserPrimitiveTokensRepository userPrimitiveTokensRepository
+    ) {
         this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
