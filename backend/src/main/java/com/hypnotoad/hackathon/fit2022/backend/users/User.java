@@ -1,10 +1,12 @@
 package com.hypnotoad.hackathon.fit2022.backend.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class User {
     private int id;
     private String username;
-
-    public User() {}
+    private String avatar;
 
     public String getUsername() {
         return username;
@@ -24,6 +26,15 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User[id=%s,username=%s]", getId(), getUsername());
+        return String.format("User[id=%s,username=%s,avatar=%s]",
+            getId(), getUsername(), getAvatar());
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

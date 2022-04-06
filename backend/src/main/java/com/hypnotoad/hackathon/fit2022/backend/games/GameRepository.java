@@ -14,15 +14,7 @@ public class GameRepository {
     private final JdbcTemplate jdbc;
     static final Logger log = LoggerFactory.getLogger(GameRepository.class);
 
-
-    private final RowMapper<Game> gameRowMapper = (rs, rowNum) -> {
-        Game rowGame = new Game();
-        rowGame.setId(rs.getInt("id"));
-        rowGame.setName(rs.getString("name"));
-        rowGame.setDescription(rs.getString("description"));
-        rowGame.setRules(rs.getString("rules"));
-        return rowGame;
-    };
+    private final RowMapper<Game> gameRowMapper;
 
     public Game findById(int id) {
         var sql = "SELECT * FROM Games WHERE id = ?";
@@ -56,7 +48,16 @@ public class GameRepository {
         }
     }
 
-    public GameRepository(JdbcTemplate jdbc) {
+    public GameRepository(String staticUrl, JdbcTemplate jdbc) {
         this.jdbc = jdbc;
+        this.gameRowMapper = (rs, rowNum) -> {
+            Game rowGame = new Game();
+            rowGame.setId(rs.getInt("id"));
+            rowGame.setName(rs.getString("name"));
+            rowGame.setDescription(rs.getString("description"));
+            rowGame.setRules(rs.getString("rules"));
+            rowGame.setIcon(staticUrl + rs.getString("icon"));
+            return rowGame;
+        };
     }
 }

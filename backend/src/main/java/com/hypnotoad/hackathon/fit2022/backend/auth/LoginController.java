@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,11 +23,17 @@ public class LoginController {
     static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @GetMapping("/api/signUp")
+    @PostMapping("/api/signUp")
     public ResponseEntity<Response> signUp(
             @RequestParam String username,
             @RequestParam String password
     ) {
         log.debug("signUp issued by user {}", username);
+
+        if (username.isBlank() || password.isBlank()) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
 
         var exists = userRepository.findByUsername(username);
         if (exists != null) {
@@ -47,11 +54,17 @@ public class LoginController {
     }
 
     @GetMapping("/api/signIn")
+    @PostMapping("/api/signIn")
     public ResponseEntity<Response> signIn(
             @RequestParam String username,
             @RequestParam String password
     ) {
         log.debug("signIn issued by user {}", username);
+
+        if (username.isBlank() || password.isBlank()) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
 
         var user = userRepository.findByUsername(username);
         if (user == null) {
@@ -121,10 +134,37 @@ public class LoginController {
         return ResponseEntity.status(200).body(new SuccessResponse("Username is unique"));
     }
 
+    // SECURITY: This is basically waiting to be hacked even with sanitizing
+    @GetMapping("/api/setAvatar")
+    public ResponseEntity<Response> setAvatar(@RequestParam String token, @RequestParam String avatar) {
+        log.debug("setAvatar issued with token {} and avatar {}", token, avatar);
+
+        var valid = userPrimitiveTokensRepository.validateToken(token);
+        if (!valid) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
+
+        if (avatar.isBlank()) {
+            log.debug("Empty fields are not allowed");
+            return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
+        }
+
+        var user = userRepository.findByToken(token);
+        var success = userRepository.setAvatarByUserId(user.getId(), avatar);
+
+        if (!success) {
+            return ResponseEntity.status(500).body(new FailResponse("Something went wrong"));
+        }
+
+        return ResponseEntity.status(200).body(new SuccessResponse("Success"));
+    }
+
     public LoginController(
             UserRepository userRepository,
             PasswordHasher passwordHasher,
-            UserPrimitiveTokensRepository userPrimitiveTokensRepository) {
+            UserPrimitiveTokensRepository userPrimitiveTokensRepository
+    ) {
         this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
