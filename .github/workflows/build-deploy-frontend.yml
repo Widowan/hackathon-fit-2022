@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Build frontend
+name: Build and deploy frontend
 
 on:
   push:
@@ -31,6 +31,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
+        
     - run: npm ci
     - run: CI=false npm run build --if-present
     - name: Upload a Build Artifact
@@ -38,3 +39,14 @@ jobs:
       with:
         name: 'frontend-artifact'
         path: 'frontend/build'
+        
+    - name: RSync deploy
+      uses: burnett01/rsync-deployments@5.2
+      with:
+        switches: -avzr --delete
+        path: frontend/build/
+        remote_path: ${{ secrets.DEPLOY_FRONTEND_TARGET }}
+        remote_host: ${{ secrets.DEPLOY_HOST }}
+        remote_port: ${{ secrets.DEPLOY_SSH_PORT }}
+        remote_user: ${{ secrets.DEPLOY_USER }}
+        remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
