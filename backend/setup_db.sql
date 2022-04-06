@@ -2,7 +2,8 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS Users(
     id            SERIAL PRIMARY KEY,
     username      VARCHAR(64) NOT NULL UNIQUE,
-    password_hash CHAR(128)   NOT NULL
+    password_hash CHAR(128)   NOT NULL,
+    avatar        TEXT        NOT NULL DEFAULT 'avatar1.svg'
 );
 CREATE TABLE IF NOT EXISTS UserTokens(
     user_id     INTEGER  NOT NULL,
@@ -14,7 +15,8 @@ CREATE TABLE IF NOT EXISTS Games(
     id          SERIAL PRIMARY KEY,
     name        TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
-    rules       TEXT NOT NULL
+    rules       TEXT NOT NULL,
+    icon        TEXT NOT NULL DEFAULT 'gameIcon1.svg'
 );
 CREATE TABLE IF NOT EXISTS GameResults(
     id           SERIAL PRIMARY KEY,
