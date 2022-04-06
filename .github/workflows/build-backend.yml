@@ -1,0 +1,65 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Build and deploy backend
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Set up configuration file
+      run: |
+        echo "$BUILD_SECRETS_FILE" > src/main/resources/datasourceSecrets.properties
+        rm src/main/resources/datasourceSecrets.properties.example
+      shell: bash
+      env:
+        BUILD_SECRETS_FILE: ${{ secrets.BUILD_SECRETS }}
+    - name: Build with Maven
+      run: mvn clean install
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Deploy to server
+      uses: easingthemes/ssh-deploy@v2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        SOURCE: 'backend/target/backend.jar'
+        REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+        REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+        REMOTE_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
+        TARGET: ${{ secrets.DEPLOY_BACKEND_TARGET }}
+
+    - name: Restart service
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_SSH_KEY }}
+        port: ${{ secrets.DEPLOY_SSH_PORT }}
+        script: ${{ secrets.DEPLOY_BACKEND_CMD }}
+
+
