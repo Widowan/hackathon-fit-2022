@@ -46,11 +46,26 @@ jobs:
         remote_user: ${{ secrets.DEPLOY_USER }}
         remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
 
+    - name: Configure SSH
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_KEY" > ~/.ssh/prod.key
+        chmod 600 ~/.ssh/prod.key
+        cat >>~/.ssh/config <<END
+        Host prod
+          HostName $SSH_HOST
+          Port $SSH_PORT
+          User $SSH_USER
+          IdentityFile ~/.ssh/prod.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_USER: ${{ secrets.DEPLOY_USER }}
+        SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        SSH_HOST: ${{ secrets.DEPLOY_HOST }}
+        SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
+        
     - name: Restart service
-      uses: garygrossgarten/github-action-ssh@v0.6.4
-      with:
-        command: ${{ secrets.DEPLOY_BACKEND_CMD }}
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: ${{ secrets.DEPLOY_USER }}
-        privateKey: ${{ secrets.DEPLOY_SSH_KEY }}
-        port: ${{ secrets.DEPLOY_SSH_PORT }}
+      run: ssh prod "$DEPLOY_BACKEND_CMD"
+      env:
+        DEPLOY_BACKEND_CMD: ${{ secrets.DEPLOY_BACKEND_CMD }}
