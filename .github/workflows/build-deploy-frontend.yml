@@ -42,7 +42,7 @@ jobs:
         
     - name: Prepare build for deployment
       run: |
-        cd frontend/build
+        cd build
         mv static/* .
         rm -rf static
         
