@@ -47,10 +47,10 @@ jobs:
         remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
 
     - name: Restart service
-      uses: appleboy/ssh-action@v0.1.4
+      uses: garygrossgarten/github-action-ssh@v0.6.4
       with:
+        command: ${{ secrets.DEPLOY_BACKEND_CMD }}
         host: ${{ secrets.DEPLOY_HOST }}
         username: ${{ secrets.DEPLOY_USER }}
-        key: ${{ secrets.DEPLOY_SSH_KEY }}
+        privateKey: ${{ secrets.DEPLOY_SSH_KEY }}
         port: ${{ secrets.DEPLOY_SSH_PORT }}
-        script: ${{ secrets.DEPLOY_BACKEND_CMD }}
