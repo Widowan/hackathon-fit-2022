@@ -21,6 +21,7 @@ public class ProjectConfiguration {
                         .allowedHeaders("*");
             }
         };
+    }
 
     @Value("${url.url}")
     public String hackathonUrl(String url) {
