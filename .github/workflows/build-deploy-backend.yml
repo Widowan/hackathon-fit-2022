@@ -32,16 +32,10 @@ jobs:
         BUILD_SECRETS_FILE: ${{ secrets.BUILD_SECRETS }}
     - name: Build with Maven
       run: mvn clean install
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - run: pwd
-    - run: ls
-    - name: rsync deployments
+    # These originally were 2 separate jobs, but github actions is SO
+    # extremely flexible system that doesn't even fucking allow you to
+    # pass builds privately, both artifacts and cache are NOT secure. Bravo 👏 
+    - name: RSync deploy
       uses: burnett01/rsync-deployments@5.2
       with:
         switches: -avzr --delete
