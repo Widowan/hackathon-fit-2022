@@ -5,6 +5,8 @@ import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.AllGameResultsResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.GameResultResponse;
+import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.GameTotalResultResponse;
+import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.LeaderboardResponse;
 import com.hypnotoad.hackathon.fit2022.backend.users.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,7 @@ public class GameResultController {
         var valid = userPrimitiveTokensRepository.validateToken(token);
         if (!valid) {
             log.debug("Provided token is invalid");
-            return ResponseEntity.status(401).body(new FailResponse("Invalid token"));
+            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
 
         var user = userRepository.findByToken(token);
@@ -52,7 +54,7 @@ public class GameResultController {
         var valid = userPrimitiveTokensRepository.validateToken(token);
         if (!valid) {
             log.debug("Provided token is invalid");
-            return ResponseEntity.status(401).body(new FailResponse("Invalid token"));
+            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
 
         var user = userRepository.findByToken(token);
@@ -72,5 +74,48 @@ public class GameResultController {
         this.gameResultRepository = gameResultRepository;
         this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
         this.userRepository = userRepository;
+    }
+
+    @GetMapping("/api/getLeaderboard")
+    public ResponseEntity<Response> getLeaderboard(@RequestParam String token, @RequestParam int gameId) {
+        log.debug("getLeaderboard issued with token {}", token);
+
+        var valid = userPrimitiveTokensRepository.validateToken(token);
+        if (!valid) {
+            log.debug("Provided token is invalid");
+            return  ResponseEntity.status(403).body(new FailResponse("Invalid token"));
+        }
+
+        var user = userRepository.findByToken(token);
+        var leaderboard = gameResultRepository.getLeaderboard(user.getId(), gameId);
+        if (leaderboard == null) {
+            log.debug("Expected empty list, got null");
+            return ResponseEntity.status(500).body(new FailResponse("Couldn't connect to database"));
+        }
+
+        return ResponseEntity.status(200).body(new LeaderboardResponse(leaderboard));
+    }
+
+    @GetMapping("/api/getGameTotalResult")
+    public ResponseEntity<Response> getGameTotalResult(
+            @RequestParam String token,
+            @RequestParam int gameId,
+            @RequestParam int days
+    ) {
+        var valid = userPrimitiveTokensRepository.validateToken(token);
+        if (!valid) {
+            log.debug("Provided token is invalid");
+            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
+        }
+
+        var user = userRepository.findByToken(token);
+        var gameResults = gameResultRepository.findGameTotalResultForDays(
+                user.getId(), gameId, days);
+        if (gameResults == null) {
+            log.debug("Nothing found");
+            return ResponseEntity.status(401).body(new FailResponse("Nothing found"));
+        }
+
+        return ResponseEntity.status(200).body(new GameTotalResultResponse(gameResults));
     }
 }
