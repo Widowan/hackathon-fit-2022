@@ -59,6 +59,8 @@
     flex-direction: column;
     align-items: center;
 
+
+
     width: 40%;
 }
 
@@ -72,19 +74,19 @@
 .conceptText span{
     color: #7AC85F;
 }
-.conceptText span2{
+.conceptText .span2{
     color: #C592A7;
 }
 
 .infoText{
     width: 100%;
     text-align: center;
-    margin-top: 70px ;
+    margin-top: clamp(35px,2vw,70px) ;
     font-size: max(1.5vw, 14pt);
     font-family: 'Intro Script R';
     font-style: normal;
 
-    line-height: 100.5%;
+    line-height: 90%;
     /* or 40px */
 
 
@@ -119,5 +121,13 @@
 
     .permanentContent{
         width: 100%;
+    }
+
+    .str2, .str3{
+        text-indent: 0;
+    }
+
+    .infoText{
+
     }
 }

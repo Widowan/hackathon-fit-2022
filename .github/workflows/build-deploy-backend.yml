@@ -1,0 +1,71 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Build and deploy backend
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Set up configuration file
+      run: |
+        echo "$BUILD_SECRETS_FILE" > src/main/resources/datasourceSecrets.properties
+        rm -rf src/main/resources/datasourceSecrets.properties.example
+      shell: bash
+      env:
+        BUILD_SECRETS_FILE: ${{ secrets.BUILD_SECRETS }}
+    - name: Build with Maven
+      run: mvn clean install
+    # These originally were 2 separate jobs, but github actions is SO
+    # extremely flexible system that doesn't even fucking allow you to
+    # pass builds privately, both artifacts and cache are NOT secure. Bravo 👏 
+    - name: RSync deploy
+      uses: burnett01/rsync-deployments@5.2
+      with:
+        switches: -avzr --delete
+        path: backend/target/backend.jar
+        remote_path: ${{ secrets.DEPLOY_BACKEND_TARGET }}
+        remote_host: ${{ secrets.DEPLOY_HOST }}
+        remote_port: ${{ secrets.DEPLOY_SSH_PORT }}
+        remote_user: ${{ secrets.DEPLOY_USER }}
+        remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+    - name: Configure SSH
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_KEY" > ~/.ssh/prod.key
+        chmod 600 ~/.ssh/prod.key
+        cat >>~/.ssh/config <<END
+        Host prod
+          HostName $SSH_HOST
+          Port $SSH_PORT
+          User $SSH_USER
+          IdentityFile ~/.ssh/prod.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_USER: ${{ secrets.DEPLOY_USER }}
+        SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        SSH_HOST: ${{ secrets.DEPLOY_HOST }}
+        SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
+        
+    - name: Restart service
+      run: ssh prod "$DEPLOY_BACKEND_CMD"
+      env:
+        DEPLOY_BACKEND_CMD: ${{ secrets.DEPLOY_BACKEND_CMD }}

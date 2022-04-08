@@ -1,0 +1,40 @@
+.stick{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 0 0 100px 100px;
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+
+
+}
+
+.stick:hover{
+
+}
+
+
+.footing{
+    height: clamp(175px, 20vw, 600px);
+    width: clamp(33px, 3.5vw, 66px);
+    display: flex;
+    justify-content: center;
+    align-items: end;
+
+    font-size: clamp(24px, 2vw, 32px);
+
+    /*padding-bottom: 50%;*/
+
+
+}
+
+.tip{
+    height: clamp(45px, 5vw, 60px);
+    border-radius: 0 0 100px 100px;
+    width: 100%;
+}
+
+.stick, .footing, .tip{
+    transition: color 0.5s;
+    transition: background-color 0.5s;
+    transition: border 0.5s;
+}

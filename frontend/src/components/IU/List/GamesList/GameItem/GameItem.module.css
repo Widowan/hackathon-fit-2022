@@ -1,0 +1,24 @@
+.gameItem{
+    width: clamp(115px,15vw,160px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gameItem img{
+    width: 100%;
+
+    border: 3px solid #2F50C4;
+    box-sizing: border-box;
+    border-radius: 19px;
+}
+
+.gameItem div{
+    text-align: center;
+    margin-top: 10px;
+    font-family: 'Intro Regular';
+    font-size: clamp(16px,1.2vw,32px);;
+
+    color: #A0ABBC;
+
+}

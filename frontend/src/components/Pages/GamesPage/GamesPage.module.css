@@ -1,0 +1,27 @@
+.gamesPage{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+    padding: clamp(25px,3vw,50px) max(25px, 10vw) 0% max(25px, 10vw);
+}
+
+.content{
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: clamp(25px,5vw,70px);
+    width: 100%;
+}
+
+.gameList{
+    width: 70%;
+}
+
+
+@media (max-width: 1023px) {
+    .gameList{
+        width: 100%;
+    }
+}

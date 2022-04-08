@@ -4,8 +4,11 @@
     justify-content: center;
     width: min(45px, 100%);
     height: min(45px, 100%);
+
+
 }
 
 .avatar img{
     width: 100%;
+    border-radius: 100px;
 }

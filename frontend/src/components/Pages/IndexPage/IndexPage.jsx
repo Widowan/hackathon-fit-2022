@@ -23,7 +23,7 @@ const IndexPage = () => {
 
             <div className={classes.permanentContent}>
                 <div className={classes.conceptText}>
-                    Веб-платформа <span>для развития <br/> памяти</span>  <span2>у людей с ОВЗ</span2>
+                    Веб-платформа <span>для развития <br/> памяти</span>  <span className={classes.span2}>у людей с ОВЗ</span>
                 </div>
 
                 <RegForm/>
