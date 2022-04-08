@@ -19,12 +19,13 @@ CREATE TABLE IF NOT EXISTS Games(
     icon        TEXT NOT NULL DEFAULT 'gameIcon1.svg'
 );
 CREATE TABLE IF NOT EXISTS GameResults(
-    id           SERIAL PRIMARY KEY,
-    user_id      INTEGER NOT NULL REFERENCES Users(id),
-    game_id      INTEGER NOT NULL REFERENCES Games(id),
-    result       BOOLEAN     NULL,
-    score        INTEGER NOT NULL,
-    time_elapsed FLOAT   NOT NULL
+    id             SERIAL  PRIMARY KEY,
+    user_id        INTEGER NOT NULL REFERENCES Users(id),
+    game_id        INTEGER NOT NULL REFERENCES Games(id),
+    result         BOOLEAN     NULL,
+    score          INTEGER NOT NULL,
+    time_elapsed   FLOAT   NOT NULL,
+    date_timestamp INTEGER NOT NULL DEFAULT extract(epoch FROM now())::Integer
 );
 CREATE TABLE IF NOT EXISTS Achievements(
     id          SERIAL PRIMARY KEY,

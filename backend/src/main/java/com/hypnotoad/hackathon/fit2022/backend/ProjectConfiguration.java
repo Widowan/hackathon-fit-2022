@@ -23,6 +23,7 @@ public class ProjectConfiguration {
         };
     }
 
+    @Bean
     @Value("${url.url}")
     public String hackathonUrl(String url) {
         return url;

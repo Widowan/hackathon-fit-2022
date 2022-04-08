@@ -1,6 +1,5 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
-import com.hypnotoad.hackathon.fit2022.backend.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -14,6 +13,8 @@ import java.util.List;
 public class GameResultRepository {
     private final JdbcTemplate jdbc;
     private final RowMapper<GameResult> gameResultRowMapper;
+    private final RowMapper<LeaderboardRow> leaderboardRowRowMapper;
+    private final RowMapper<GameTotalResult> totalResultRowMapper;
     private final static Logger log = LoggerFactory.getLogger(GameResultRepository.class);
 
     public GameResult findById(int id) {
@@ -63,8 +64,78 @@ public class GameResultRepository {
             }
             return findLast();
         } catch (DataAccessException e) {
-            log.error("Couldn't insert to database - data access exception");
+            log.error("Couldn't insert to database - data access exception", e);
         }
+
+        return null;
+    }
+
+    public List<LeaderboardRow> getLeaderboard(int userId, int gameId) {
+        var sql = "WITH SummedScoreTable AS (                                  " +
+                "    SELECT                                                    " +
+                "        user_id,                                              " +
+                "        game_id,                                              " +
+                "        SUM(score) AS sum_score                               " +
+                "    FROM GameResults                                          " +
+                "    WHERE game_id = ?                                         " +
+                "    GROUP BY user_id, game_id                                 " +
+                "),                                                            " +
+                "PlacedScoreBoard AS (                                         " +
+                "    SELECT                                                    " +
+                "        user_id,                                              " +
+                "        Row_Number() OVER (ORDER BY sum_score DESC) AS place, " +
+                "        sum_score                                             " +
+                "    FROM SummedScoreTable                                     " +
+                "),                                                            " +
+                "UsernameTable AS (                                            " +
+                "    SELECT                                                    " +
+                "        id,                                                   " +
+                "        username                                              " +
+                "    FROM Users                                                " +
+                ")                                                             " +
+                "SELECT                                                        " +
+                "    user_id, place, sum_score, username                       " +
+                "FROM                                                          " +
+                "    PlacedScoreboard p                                        " +
+                "LEFT JOIN UsernameTable u                                     " +
+                "    ON p.user_id = u.id                                       " +
+                "WHERE                                                         " +
+                "    place <= 10                                               " +
+                "    OR p.user_id = ?                                          " +
+                "ORDER BY                                                      " +
+                "    place                                                     " +
+                ";                                                             ";
+        try {
+            return jdbc.query(sql, leaderboardRowRowMapper, gameId, userId);
+        } catch (DataAccessException e) {
+            log.error("Couldn't access database during leaderboard creation", e);
+        }
+
+        return null;
+    }
+
+    public GameTotalResult findGameTotalResultForDays(int userId, int gameId, int days) {
+        var sql = "WITH DatesTable AS (                                              " +
+                "    SELECT                                                          " +
+                "        user_id,                                                    " +
+                "        game_id,                                                    " +
+                "        score,                                                      " +
+                "        date_timestamp                                              " +
+                "    FROM GameResults                                                " +
+                "    WHERE (extract(epoch from now())::Integer - date_timestamp) < ? " +
+                ")                                                                   " +
+                "SELECT                                                              " +
+                "    user_id,                                                        " +
+                "    game_id,                                                        " +
+                "    SUM(score) as sum_score                                         " +
+                "FROM DatesTable                                                     " +
+                "GROUP BY user_id, game_id                                           " +
+                "HAVING user_id = ? AND game_id = ?                                  " +
+                ";                                                                   ";
+        try {
+            return jdbc.queryForObject(sql, totalResultRowMapper,
+            days*24*60*60, userId, gameId);
+        } catch (DataAccessException ignored) {}
 
         return null;
     }
@@ -79,7 +150,23 @@ public class GameResultRepository {
             rowGameResult.setResult(rs.getBoolean("result"));
             rowGameResult.setScore(rs.getInt("score"));
             rowGameResult.setTimeElapsed(rs.getFloat("time_elapsed"));
+            rowGameResult.setDateTimestamp(rs.getInt("date_timestamp"));
             return rowGameResult;
+        };
+        this.leaderboardRowRowMapper = (rs, rowNum) -> {
+            var leaderboardRow = new LeaderboardRow();
+            leaderboardRow.setUserId(rs.getInt("user_id"));
+            leaderboardRow.setUsername(rs.getString("username"));
+            leaderboardRow.setSumScore(rs.getInt("sum_score"));
+            leaderboardRow.setPlace(rs.getInt("place"));
+            return leaderboardRow;
+        };
+        this.totalResultRowMapper = (rs, rowNum) -> {
+            var totalResult = new GameTotalResult();
+            totalResult.setGameId(rs.getInt("game_id"));
+            totalResult.setSumScore(rs.getInt("sum_score"));
+            totalResult.setUserId(rs.getInt("user_id"));
+            return totalResult;
         };
     }
 }
