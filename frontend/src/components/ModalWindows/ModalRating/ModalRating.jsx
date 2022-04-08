@@ -1,22 +1,23 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import classes from "./ModalRating.module.css";
 import RatingItem from "../../IU/List/RatingList/RatingItem/RatingItem";
+import Service from "../../../Service/Service";
 
 const ModalRating = (props) => {
 
     const [modal, setModal] = useState(false);
-    const zaglushka = "https://st2.depositphotos.com/5266903/8766/v/450/depositphotos_87660356-stock-illustration-healh-care-emblem-icon.jpg";
+    // const zaglushka = "https://st2.depositphotos.com/5266903/8766/v/450/depositphotos_87660356-stock-illustration-healh-care-emblem-icon.jpg";
     const [rating, setRating] = useState([
-        {nik: "lol kek", img: zaglushka, count: 200, index: 1},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 2},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 3},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 4},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 5},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 6},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 7},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 8},
-        {nik: "lol kek", img: zaglushka, count: 200, index: 9},
+        {username: "lol kek", sumScore: 200, place: 1},
     ])
+
+    useEffect(()=>{
+        const getRating = async () =>{
+            const response= await Service.getLeaderBoard(props.id);
+            setRating(response)
+        }
+        getRating();
+    },[modal])
 
     return (
         <div className={classes.modalRating}>
@@ -47,14 +48,14 @@ const ModalRating = (props) => {
                 <div className={classes.rating}>
                     {
                         rating.map(rat =>
-                            <RatingItem nik={rat.nik} img={rat.img} count={rat.count} color="green" index={rat.index}
-                                        key={rat.index}/>
+                            <RatingItem nik={rat.username} img="" count={rat.sumScore} color="green" index={rat.place}
+                                        key={rat.place}/>
                         )
                     }
 
                 </div>
                 <div className={classes.footer}>
-                    <RatingItem nik="никнейм" img={zaglushka} count="200" color="green" index="55"/>
+                    <RatingItem nik={rating[rating.length-1].username} count={rating[rating.length-1].sumScore} color="green" index={rating[rating.length-1].place}/>
                 </div>
 
 

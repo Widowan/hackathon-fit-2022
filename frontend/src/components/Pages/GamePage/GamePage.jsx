@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import classes from "./GamePage.module.css";
 import PageTitle from "../../IU/Text/PageTitle/PageTitle";
 import {useNavigate, useParams} from "react-router-dom";
@@ -6,6 +6,7 @@ import DescriptionMobile from "./DescriptionMobaile/DescriptionMobile";
 import ModalRating from "../../ModalWindows/ModalRating/ModalRating";
 import GameOne from "../../Games/GameOne/GameOne";
 import {BallsContext} from "../../../context";
+import Service from "../../../Service/Service";
 
 const GamePage = () => {
 
@@ -13,6 +14,22 @@ const GamePage = () => {
     const route = useNavigate();
     const [title, setTitle] = useState("Название игры")
     const [balls, setBalls] = useState(0)
+    const [check, setCheck] = useState(0)
+    const [status, setStatus] = useState({
+        days:0,
+        month:0
+    });
+
+    useEffect(()=>{
+        async function getStatus (){
+            const response = await Service.getStatusBalls(params.id)
+            setStatus(response)
+            console.log(response);
+        }
+        getStatus();
+
+
+    },[check])
 
     const fish = "Для современного мира новая модель организационной деятельности играет определяющее значение для первоочередных требований. Разнообразный и богатый опыт говорит нам, что понимание сути ресурсосберегающих технологий способствует повышению качества системы обучения кадров, соответствующей насущным потребностям.";
 
@@ -46,10 +63,10 @@ const GamePage = () => {
 
                 </div>
                 <BallsContext.Provider value={{
-                    balls, setBalls
+                    balls, setBalls, check, setCheck
                 }}>
                 <div className={classes.game}>
-                    <GameOne id={1}/>
+                    <GameOne id={params.id}/>
                 </div>
                 <div className={classes.status}>
                     <div className={classes.statusTitle}>
@@ -64,11 +81,11 @@ const GamePage = () => {
                         <div>Текщии</div>
                     </div>
                     <div className={classes.descriptionTitle}>
-                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div className={classes.balls}>{status.days+" б."}</div>
                         <div>За день</div>
                     </div>
                     <div className={classes.descriptionTitle}>
-                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div className={classes.balls}>{status.days+" б."}</div>
                         <div>За неделю</div>
                     </div>
 

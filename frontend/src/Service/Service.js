@@ -72,14 +72,58 @@ export default class Service {
 
         }catch (error){
 
-            console.log("error")
+            console.log(error)
+            const chek = await Api.getMe()
+            // if(chek.isError){
+            //     localStorage.removeItem("token")
+            //     Document.location.reload();
+            //     return true;
+            // }
+            return false
+        }
+    }
+
+    static async getStatusBalls(gameId){
+        try {
+
+            const result1 = await Api.getBalls(1,gameId);
+            const result2 = await Api.getBalls(7,gameId);
+            return {
+                days: result1.data.gameTotalResult.sumScore,
+                month: result2.data.gameTotalResult.sumScore,
+            };
+
+        }catch (error){
+
+            console.log(error)
             const chek = await Api.getMe()
             if(chek.isError){
                 localStorage.removeItem("token")
                 Document.location.reload();
-                return true;
+                return {
+                    days:"Ошибка подгрузки",
+                    month:"Ошибка подгрузки"
+                };
             }
-            return false
+            return {
+                days:"Ошибка подгрузки",
+                month:"Ошибка подгрузки"
+            };
+        }
+    }
+
+    static async getLeaderBoard(gameId){
+        try {
+
+            const result = await Api.getLeaderBoard(gameId);
+            return result.data.leaderboard;
+
+        }catch (error){
+
+            return {"userId": "error",
+                "place": 1,
+                "sumScore": "error",
+                "username": "error"}
         }
     }
 

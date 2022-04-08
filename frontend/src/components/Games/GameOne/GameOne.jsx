@@ -22,7 +22,7 @@ const GameOne = ({id}) => {
     const [noteArr, setNoteArr] = useState([])
     const [active, setActive] = useState(7)
     const [motion, setMotion] = useState(0)
-    const {balls, setBalls} = useContext(BallsContext)
+    const {balls, setBalls, check, setCheck} = useContext(BallsContext)
 
 
 
@@ -92,7 +92,10 @@ const GameOne = ({id}) => {
         }else{
             const response = await Service.addGameResult(id,balls);
             setBalls(0);
-            if(response) alert("Ошибка на сервере, результат не сохранён!");
+            console.log(response)
+            if(!response) alert("Ошибка на сервере, результат не сохранён!");
+            else setCheck(check+1)
+
         }
     }
 

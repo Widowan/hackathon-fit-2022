@@ -9,10 +9,13 @@ const RatingItem = (props) => {
             border: props.color+" 1px solid",
             borderRadius: "41px"
         }}>
-            <CircleAvatar src={props.img} alt="ava"/>
-            <div>{props.index}</div>
-            <div>{props.nik}</div>
-            <div>{props.count}</div>
+            {/*<CircleAvatar src={props.img} alt="ava"/>*/}
+            <div className={classes.avatar}>
+                <CircleAvatar src="http://krutna.ddns.net/static/default.svg" alt="ava"/>
+            </div>
+            <div className={classes.index}>{props.index}</div>
+            <div className={classes.nik} tabIndex={99999}>{props.nik}</div>
+            <div className={classes.balls}>{props.count}</div>
         </div>
     );
 };
