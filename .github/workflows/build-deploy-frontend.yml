@@ -47,7 +47,7 @@ jobs:
     - name: RSync deploy
       uses: burnett01/rsync-deployments@5.2
       with:
-        switches: -avzr --delete
+        switches: -avzr
         path: frontend/build/
         remote_path: ${{ secrets.DEPLOY_FRONTEND_TARGET }}
         remote_host: ${{ secrets.DEPLOY_HOST }}
