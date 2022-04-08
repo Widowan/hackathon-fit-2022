@@ -30,5 +30,21 @@ export default class Api {
   const response = await axios.get(serves.domen()+"getAllGames");
   return response;
  }
+
+ static async addGameResult(gameId,score,timeElapsed = 0){
+  // let form = new FormData;
+  // form.append("token", localStorage.getItem("token"))
+  // form.append("gameId ", gameId)
+  // form.append("result ", null)
+  // form.append("score", score)
+  // form.append("timeElapsed ", timeElapsed)
+  const response = await axios.post(serves.domen()+"addGameResult?"+
+      "token="+localStorage.getItem("token")+
+      "&gameId="+gameId+
+      "&result=true"+
+      "&score="+score+
+      "&timeElapsed="+timeElapsed, {});
+  return response;
+ }
 }
 

@@ -75,6 +75,21 @@
     justify-content: center;
 }
 
+.statusTitle{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.statusInfo{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    /*align-items: center;*/
+    justify-content: space-around;
+}
+
 .descriptionTitle{
     width: 100%;
     text-align: center;
@@ -103,6 +118,13 @@
     cursor: pointer;
 }
 
+.balls{
+    border: solid #75BE3C;
+    border-width: 0 0 1px 0;
+    /*padding:  0 10%;*/
+    margin: 0 20%;
+}
+
 @media (max-width: 1023px) {
     .content{
         flex-direction: column;
@@ -119,7 +141,9 @@
         pointer-events: auto;
     }
 
-
+    .statusInfo{
+        flex-direction: row;
+    }
 
     .game{
         width: 100%;

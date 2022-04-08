@@ -63,5 +63,25 @@ export default class Service {
         }
     }
 
+    static async addGameResult(gameId,score,timeElapsed = 0){
+
+        try {
+
+            await Api.addGameResult(gameId,score,timeElapsed);
+            return true;
+
+        }catch (error){
+
+            console.log("error")
+            const chek = await Api.getMe()
+            if(chek.isError){
+                localStorage.removeItem("token")
+                Document.location.reload();
+                return true;
+            }
+            return false
+        }
+    }
+
 
 }

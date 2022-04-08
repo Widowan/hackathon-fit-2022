@@ -2,17 +2,19 @@
 
 }
 
-.modalRating input{
-    font-family: "Intro Regular";
-    background: #FFFFFF;
-    border: 1px solid #F0CC6E;
-    box-sizing: border-box;
-    border-radius: 43px;
+.modalRating svg{
+    /*font-family: "Intro Regular";*/
+    /*background: #FFFFFF;*/
+    /*border: 1px solid #F0CC6E;*/
+    /*box-sizing: border-box;*/
+    /*border-radius: 43px;*/
 
-    font-size: 32px;
-    color: #F2D380;
+    /*font-size: 32px;*/
+    /*color: #F2D380;*/
 
-    padding: 10px 65px;
+    /*padding: 10px 65px;*/
+
+    width: clamp(18px,3vw,32px);
 }
 
 .smoky, .noSmoky{

@@ -1,3 +1,78 @@
 .level{
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
 
+.ui{
+    display: flex;
+    align-items: center;
+    justify-content: end;
+
+
+    height: clamp(30px,5vw,98px);
+
+    margin-left: 2% ;
+}
+
+.value, .valueMobile{
+    background: #FFFFFF;
+    border: 1px solid #80BB67;
+    box-sizing: border-box;
+    border-radius: 5px;
+
+    width: clamp(30px,5vw,98px);
+    height: 100%;
+    /*height: clamp(30px,5vw,98px);*/
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+.text{
+    text-align: end;
+}
+
+.text, .value{
+    font-size: clamp(20px,1.5vw,100px);
+    color: #80BB67;
+
+}
+
+.buttons{
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 1% ;
+}
+
+.buttons svg, .noButtons{
+    width: clamp(15px,2.5vw,49px);
+    height: 50%;
+    transition: opacity 0.5s;
+}
+
+.valueMobile{
+    height: clamp(30px,5vw,98px);
+    display: none;
+}
+
+.noButtons{
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+    .valueMobile{
+        display: flex;
+    }
+    .value{
+        display: none;
+    }
+    .buttons svg{
+        width: clamp(30px,5vw,98px);
+    }
 }

@@ -5,12 +5,14 @@ import {useNavigate, useParams} from "react-router-dom";
 import DescriptionMobile from "./DescriptionMobaile/DescriptionMobile";
 import ModalRating from "../../ModalWindows/ModalRating/ModalRating";
 import GameOne from "../../Games/GameOne/GameOne";
+import {BallsContext} from "../../../context";
 
 const GamePage = () => {
 
     const params = useParams();
     const route = useNavigate();
     const [title, setTitle] = useState("Название игры")
+    const [balls, setBalls] = useState(0)
 
     const fish = "Для современного мира новая модель организационной деятельности играет определяющее значение для первоочередных требований. Разнообразный и богатый опыт говорит нам, что понимание сути ресурсосберегающих технологий способствует повышению качества системы обучения кадров, соответствующей насущным потребностям.";
 
@@ -43,16 +45,39 @@ const GamePage = () => {
                     </div>
 
                 </div>
+                <BallsContext.Provider value={{
+                    balls, setBalls
+                }}>
                 <div className={classes.game}>
-                    <GameOne/>
+                    <GameOne id={1}/>
                 </div>
                 <div className={classes.status}>
-                    <div className={classes.descriptionTitle}>Статус</div>
-                    <div className={classes.descriptionTitle}>Статус</div>
+                    <div className={classes.statusTitle}>
+                        <div className={classes.modalRating}></div>
+                        <div className={classes.descriptionTitle}>Статус</div>
+                        <div className={classes.modalRating}><ModalRating id={params.id}/></div>
+                    </div>
+
+                    <div className={classes.statusInfo}>
+                    <div className={classes.descriptionTitle}>
+                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div>Текщии</div>
+                    </div>
+                    <div className={classes.descriptionTitle}>
+                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div>За день</div>
+                    </div>
+                    <div className={classes.descriptionTitle}>
+                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div>За неделю</div>
+                    </div>
+
+                    </div>
                     <div className={classes.modalRating}>
-                       <ModalRating id={params.id}/>
+                        {/*<ModalRating id={params.id}/>*/}
                     </div>
                 </div>
+                </BallsContext.Provider>
 
             </div>
 
