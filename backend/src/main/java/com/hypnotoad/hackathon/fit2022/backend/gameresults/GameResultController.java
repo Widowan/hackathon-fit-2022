@@ -67,7 +67,7 @@ public class GameResultController {
         return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
     }
 
-    @PostMapping("/api/addGameResult")
+//    @PostMapping("/api/addGameResult")
     @GetMapping("/api/addGameResult")
     public ResponseEntity<Response> addGameResult(@RequestParam String token,
             @RequestParam int gameId, @RequestParam boolean result,
