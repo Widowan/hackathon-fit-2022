@@ -23,9 +23,9 @@ public class GameResultController {
     GameResultRepository gameResultRepository;
     static final Logger log = LoggerFactory.getLogger(GameResultController.class);
 
-    @GetMapping("/api/getAllGamesByUser")
-    public ResponseEntity<Response> getAllGamesByUser(@RequestParam String token) {
-        log.debug("getAllGamesByUser issued with token {}", token);
+    @GetMapping("/api/getAllGameResultsByUser")
+    public ResponseEntity<Response> getAllGameResultsByUser(@RequestParam String token) {
+        log.debug("getAllGameResultsByUser issued with token {}", token);
 
         var valid = userPrimitiveTokensRepository.validateToken(token);
         if (!valid) {
@@ -40,6 +40,28 @@ public class GameResultController {
             return ResponseEntity.status(500).body(new FailResponse("Couldn't access the database"));
         }
 
+        return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
+    }
+
+    // Okay this is basically copy-paste already, aspects ASAP
+    @GetMapping("/api/getGameResultsByUser")
+    public ResponseEntity<Response> getGameResultsByUser(@RequestParam String token, @RequestParam int gameId) {
+        log.debug("getGameResultsByUser issued with token {}", token);
+
+        var valid = userPrimitiveTokensRepository.validateToken(token);
+        if (!valid) {
+            log.debug("Provided token is invalid");
+            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
+        }
+
+        var user = userRepository.findByToken(token);
+        var gameResults = gameResultRepository.findAllByUserId(user.getId());
+        if (gameResults == null) {
+            log.debug("Found null, expected empty list");
+            return ResponseEntity.status(500).body(new FailResponse("Couldn't access the database"));
+        }
+
+        gameResults = gameResults.stream().filter(gr -> gr.getGameId() == gameId).toList();
         return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
     }
 
