@@ -38,11 +38,11 @@ jobs:
         name: 'frontend-artifact'
         path: 'frontend/build'
         
-#     - name: Prepare build for deployment
-#       run: |
-#         cd build
-#         mv static/* .
-#         rm -rf static
+    - name: Prepare build for deployment
+      run: |
+        cd build
+        mv static/* .
+        rm -rf static
         
     - name: RSync deploy
       uses: burnett01/rsync-deployments@5.2
