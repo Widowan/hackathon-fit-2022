@@ -7,6 +7,7 @@ public class GameResult {
     private boolean result;
     private int score;
     private float timeElapsed;
+    private int dateTimestamp;
 
     public GameResult() {}
 
@@ -56,5 +57,13 @@ public class GameResult {
 
     public void setGameId(int gameId) {
         this.gameId = gameId;
+    }
+
+    public int getDateTimestamp() {
+        return dateTimestamp;
+    }
+
+    public void setDateTimestamp(int dateTimestamp) {
+        this.dateTimestamp = dateTimestamp;
     }
 }

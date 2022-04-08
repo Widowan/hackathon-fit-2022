@@ -1,8 +1,5 @@
 package com.hypnotoad.hackathon.fit2022.backend.users;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.beans.factory.annotation.Autowired;
-
 public class User {
     private int id;
     private String username;

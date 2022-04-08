@@ -1,6 +1,7 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
 import com.hypnotoad.hackathon.fit2022.backend.auth.token.UserPrimitiveTokensRepository;
+import com.hypnotoad.hackathon.fit2022.backend.games.GameRepository;
 import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.AllGameResultsResponse;
@@ -21,6 +22,7 @@ public class GameResultController {
     UserRepository userRepository;
     UserPrimitiveTokensRepository userPrimitiveTokensRepository;
     GameResultRepository gameResultRepository;
+    GameRepository gameRepository;
     static final Logger log = LoggerFactory.getLogger(GameResultController.class);
 
     @GetMapping("/api/getAllGameResultsByUser")
@@ -65,7 +67,6 @@ public class GameResultController {
         return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
     }
 
-    // SECURITY: No bounds check
     @PostMapping("/api/addGameResult")
     public ResponseEntity<Response> addGameResult(@RequestParam String token,
             @RequestParam int gameId, @RequestParam boolean result,
@@ -77,6 +78,12 @@ public class GameResultController {
         if (!valid) {
             log.debug("Provided token is invalid");
             return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
+        }
+
+        var game = gameRepository.findById(gameId);
+        if (game == null) {
+            log.debug("Such game doesn't exists");
+            return ResponseEntity.status(401).body(new FailResponse("Game doesn't exists"));
         }
 
         var user = userRepository.findByToken(token);
@@ -91,11 +98,13 @@ public class GameResultController {
 
     public GameResultController(UserRepository userRepository,
             UserPrimitiveTokensRepository userPrimitiveTokensRepository,
-            GameResultRepository gameResultRepository
+            GameResultRepository gameResultRepository,
+            GameRepository gameRepository
     ) {
         this.gameResultRepository = gameResultRepository;
         this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
         this.userRepository = userRepository;
+        this.gameRepository = gameRepository;
     }
 
     @GetMapping("/api/getLeaderboard")
@@ -106,6 +115,12 @@ public class GameResultController {
         if (!valid) {
             log.debug("Provided token is invalid");
             return  ResponseEntity.status(403).body(new FailResponse("Invalid token"));
+        }
+
+        var game = gameRepository.findById(gameId);
+        if (game == null) {
+            log.debug("Such game doesn't exists");
+            return ResponseEntity.status(401).body(new FailResponse("Game doesn't exists"));
         }
 
         var user = userRepository.findByToken(token);
@@ -128,6 +143,12 @@ public class GameResultController {
         if (!valid) {
             log.debug("Provided token is invalid");
             return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
+        }
+
+        var game = gameRepository.findById(gameId);
+        if (game == null) {
+            log.debug("Such game doesn't exists");
+            return ResponseEntity.status(401).body(new FailResponse("Game doesn't exists"));
         }
 
         var user = userRepository.findByToken(token);
