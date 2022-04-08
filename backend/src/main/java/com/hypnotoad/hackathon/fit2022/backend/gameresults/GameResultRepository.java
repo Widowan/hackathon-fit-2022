@@ -150,6 +150,7 @@ public class GameResultRepository {
             rowGameResult.setResult(rs.getBoolean("result"));
             rowGameResult.setScore(rs.getInt("score"));
             rowGameResult.setTimeElapsed(rs.getFloat("time_elapsed"));
+            rowGameResult.setDateTimestamp(rs.getInt("date_timestamp"));
             return rowGameResult;
         };
         this.leaderboardRowRowMapper = (rs, rowNum) -> {
