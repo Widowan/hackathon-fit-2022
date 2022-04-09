@@ -29,7 +29,7 @@ const GamesList = () => {
 
     const addingArray = () => {
         if (listGames.length < 12) {
-            let count = 12 - listGames.length;
+            let count = 10 - listGames.length;
             let gemesArr = [];
             for (let i = 0; i < count; i++) {
                 gemesArr.push({
