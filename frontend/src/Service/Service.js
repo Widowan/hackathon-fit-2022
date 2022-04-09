@@ -95,7 +95,7 @@ export default class Service {
 
         }catch (error){
 
-            console.log(error)
+            console.log(error.message)
             const chek = await Api.getMe()
             if(chek.isError){
                 localStorage.removeItem("token")
@@ -105,9 +105,10 @@ export default class Service {
                     month:"Ошибка подгрузки"
                 };
             }
-            return {
-                days:"Ошибка подгрузки",
-                month:"Ошибка подгрузки"
+            if (error.message =="Request failed with status code 401")
+                return {
+                days:0,
+                month:0
             };
         }
     }

@@ -31,7 +31,7 @@ const MobileMenu = () => {
 
 
             <div className={!menu ? classes.dropdownContent : classes.dropdownContentClose}>
-                <Link to="/auth" onClick={close} className={classes.startLink}>Меню</Link>
+                <div  onClick={close} className={classes.startLink}>Меню</div>
                 <Link to="/auth" onClick={close} className={classes.link}>Личный кабинет</Link>
                 <Link to="/games" onClick={close} className={classes.link}>Игры / Тренажёры</Link>
                 {/*<Link to="/auth" onClick={close} className={classes.link}>Ретинг</Link>*/}

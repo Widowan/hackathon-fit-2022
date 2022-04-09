@@ -90,10 +90,28 @@
 
     border-width: 0 0 1px 0;
 }
+
 .rating{
-    overflow: auto;
+    overflow: overlay;
     max-height: 50vh;
 }
+@-moz-document url-prefix() {
+    .rating{
+        overflow: auto;
+        scrollbar-color: rgba(166, 166, 166, 0.36);
+    }
+
+}
+
+/*.rating::-webkit-scrollbar{*/
+/*    overflow: overlay;*/
+/*}*/
+
+.rating::-moz-scrolled-content{
+    overflow: auto;
+}
+
+
 
 @media (max-width: 1024px) {
     .modal, .noModal{

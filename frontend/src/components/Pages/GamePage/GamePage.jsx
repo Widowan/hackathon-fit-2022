@@ -78,7 +78,7 @@ const GamePage = () => {
                     <div className={classes.statusInfo}>
                     <div className={classes.descriptionTitle}>
                         <div className={classes.balls}>{balls+" б."}</div>
-                        <div>Текщии</div>
+                        <div>Текщие</div>
                     </div>
                     <div className={classes.descriptionTitle}>
                         <div className={classes.balls}>{status.days+" б."}</div>
