@@ -76,14 +76,14 @@ const GamePage = () => {
                 <div className={classes.status}>
                     <div className={classes.statusTitle}>
                         <div className={classes.modalRating}></div>
-                        <div className={classes.descriptionTitle}>Статус</div>
+                        <div className={classes.descriptionTitle}>Статистика</div>
                         <div className={classes.modalRating}><ModalRating id={params.id}/></div>
                     </div>
 
                     <div className={classes.statusInfo}>
                     <div className={classes.descriptionTitle}>
                         <div className={classes.balls}>{balls+" б."}</div>
-                        <div>Текщие</div>
+                        <div>Текущие</div>
                     </div>
                     <div className={classes.descriptionTitle}>
                         <div className={classes.balls}>{status.days+" б."}</div>

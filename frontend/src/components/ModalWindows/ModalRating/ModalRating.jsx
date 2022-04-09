@@ -22,9 +22,9 @@ const ModalRating = (props) => {
         {username: "", sumScore: 0, place: 1},
     ])
 
-    const iteratingUsers = () => {
+    const iteratingUsers = (response) => {
         console.log(user)
-        rating.map(rat => {
+        response.map(rat => {
 
         if (rat.userId == user.id) {
             console.log(userData)
@@ -40,11 +40,23 @@ const ModalRating = (props) => {
     useEffect(() => {
         const getRating = async () => {
             const response = await Service.getLeaderBoard(props.id);
-            setRating(response)
+            iteratingUsers(response);
+
+            let rat = [];
+
+            if (rating.length==11){
+
+                for (let i =0; i<10;i++){
+                    rat.push(rating[i])
+                }
+            }else rat = response
+            setRating(rat)
+
+
         }
         getRating();
 
-        iteratingUsers();
+
 
     }, [modal])
 
