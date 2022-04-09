@@ -7,6 +7,7 @@ import GamesPage from "./components/Pages/GamesPage/GamesPage";
 import GamePage from "./components/Pages/GamePage/GamePage";
 import {AuthContext} from "./context";
 import Service from "./Service/Service";
+import PersonalAccount from "./components/Pages/PersonalAccount/PersonalAccount";
 
 function App() {
     const [user, setUser] = useState({
@@ -53,6 +54,7 @@ function App() {
                     {token ?
                         <Routes>
                             <Route path="games" element={<GamesPage/>}/>
+                            <Route path="office" element={<PersonalAccount/>}/>
                             <Route path="games/:id" element={<GamePage/>}/>
                             <Route path="*" element={<GamesPage/>}/>
                         </Routes>
