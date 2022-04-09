@@ -12,7 +12,10 @@ const GamePage = () => {
 
     const params = useParams();
     const route = useNavigate();
-    const [title, setTitle] = useState("Название игры")
+    const [gameInfo, setGameInfo] = useState({
+        title:"",
+        rules:""
+    });
     const [balls, setBalls] = useState(0)
     const [check, setCheck] = useState(0)
     const [status, setStatus] = useState({
@@ -23,7 +26,9 @@ const GamePage = () => {
     useEffect(()=>{
         async function getStatus (){
             const response = await Service.getStatusBalls(params.id)
+            const game = await Service.getGameById(params.id)
             setStatus(response)
+            setGameInfo(game);
             console.log(response);
         }
         getStatus();
@@ -31,7 +36,7 @@ const GamePage = () => {
 
     },[check])
 
-    const fish = "Для современного мира новая модель организационной деятельности играет определяющее значение для первоочередных требований. Разнообразный и богатый опыт говорит нам, что понимание сути ресурсосберегающих технологий способствует повышению качества системы обучения кадров, соответствующей насущным потребностям.";
+    // const fish = "Для современного мира новая модель организационной деятельности играет определяющее значение для первоочередных требований. Разнообразный и богатый опыт говорит нам, что понимание сути ресурсосберегающих технологий способствует повышению качества системы обучения кадров, соответствующей насущным потребностям.";
 
     return (
         <div className={classes.gamePage}>
@@ -46,10 +51,10 @@ const GamePage = () => {
                 </svg>
 
                 <div className={classes.pageTitle}>
-                    <PageTitle text={title} />
+                    <PageTitle text={gameInfo.title} />
                 </div>
 
-                <div className={classes.svgMobile}><DescriptionMobile text={fish}/></div>
+                <div className={classes.svgMobile}><DescriptionMobile text={gameInfo.rules}/></div>
 
 
             </div>
@@ -58,7 +63,7 @@ const GamePage = () => {
                 <div className={classes.description}>
                     <div className={classes.descriptionTitle}>Правила</div>
                     <div className={classes.descriptionText}>
-                        {fish}
+                        {gameInfo.rules}
                     </div>
 
                 </div>

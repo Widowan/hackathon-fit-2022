@@ -128,5 +128,21 @@ export default class Service {
         }
     }
 
+    static async getGameById(gameId){
+        try {
+
+            const result = await Api.getGameById(gameId);
+            return {
+               title: result.data.game.name,
+                rules: result.data.game.rules
+            }
+
+        }catch (error){
+
+            return {"title": "Ошибка подгрузки",
+                "rules": "Ошибка подгрузки"}
+        }
+    }
+
 
 }

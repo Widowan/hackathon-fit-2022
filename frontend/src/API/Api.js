@@ -65,5 +65,13 @@ export default class Api {
 
     }
 
+    static async getGameById(gameId) {
+        const response = await axios.get(serves.domen() + "getGameById?" +
+            "&id=" + gameId
+        );
+        return response;
+
+    }
+
 }
 
