@@ -1,0 +1,16 @@
+.gamesList{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.gamesItem{
+    margin: 2% 4%;
+}
+
+@media (max-width: 776px) {
+    .gamesList{
+        justify-content: space-around;
+    }
+}

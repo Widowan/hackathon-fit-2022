@@ -34,8 +34,8 @@
     text-decoration: none;
     color: #525A9E;
 
-    font-family: 'Intro Script R';
-    font-size: 32px;
+    font-family: 'Intro Regular';
+    font-size: 28px;
     width: max(90%, 280px);
     text-align: center;
 
@@ -48,8 +48,8 @@
     text-decoration: none;
     color: #525A9E;
 
-    font-family: 'Intro Script R';
-    font-size: 32px;
+    font-family: 'Intro Regular';
+    font-size: 28px;
     width: max(90%, 280px);
     text-align: center;
 
@@ -80,4 +80,12 @@
         display: none;
     }
     
+}
+
+.svg{
+    /*position: absolute;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+    /*margin: 0 0 -32px -64px;*/
+    transform: translate(-45px,32px);
 }

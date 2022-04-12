@@ -16,6 +16,8 @@
 
     padding: 3%;
 
+    transition-duration: 1s;
+
     /*height: 346px;*/
 }
 
@@ -23,6 +25,7 @@
     min-width: 16pt;
     text-decoration: underline;
     text-align: end;
+    cursor: pointer;
 }
 
 .titel{
@@ -64,4 +67,14 @@
 
     margin-top: 10%;
     margin-bottom: 5%;
+}
+
+.error, .noError{
+    color: rosybrown;
+    margin-top: 5px;
+    /*margin-bottom: -21px;*/
+}
+
+.noError{
+    display: none;
 }
