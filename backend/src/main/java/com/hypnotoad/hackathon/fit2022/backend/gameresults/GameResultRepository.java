@@ -157,12 +157,10 @@ public class GameResultRepository {
                 .sumScore(rs.getInt("sum_score"))
                 .username(rs.getString("username"))
                 .build();
-        this.totalResultRowMapper = (rs, rowNum) -> {
-            var totalResult = new GameTotalResult();
-            totalResult.setGameId(rs.getInt("game_id"));
-            totalResult.setSumScore(rs.getInt("sum_score"));
-            totalResult.setUserId(rs.getInt("user_id"));
-            return totalResult;
-        };
+        this.totalResultRowMapper = (rs, rowNum) -> ImmutableGameTotalResult.builder()
+                .userId(rs.getInt("user_id"))
+                .gameId(rs.getInt("game_id"))
+                .sumScore(rs.getInt("sum_score"))
+                .build();
     }
 }
