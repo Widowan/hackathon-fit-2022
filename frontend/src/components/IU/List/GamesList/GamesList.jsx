@@ -3,6 +3,7 @@ import classes from "./GamesList.module.css";
 import GameItem from "./GameItem/GameItem";
 import {useNavigate} from "react-router-dom";
 import Service from "../../../../Service/Service";
+import img from "./../../../../img/iconDefault.png"
 
 
 const GamesList = () => {
@@ -10,6 +11,7 @@ const GamesList = () => {
     const route = useNavigate();
 
     const [listGames, setListGames] = useState([]);
+    const [listGames2, setListGames2] = useState([]);
 
     const getAllGames = async () => {
         const games = await Service.getAllGames();
@@ -22,29 +24,34 @@ const GamesList = () => {
 
     useEffect(() => {
         getAllGames();
+        addingArray();
     }, [])
 
     const addingArray = () => {
         if (listGames.length < 12) {
-            for (let i = 0; i < 12 - listGames.length; i++) {
-                setListGames([...listGames, {
+            let count = 10 - listGames.length;
+            let gemesArr = [];
+            for (let i = 0; i < count; i++) {
+                gemesArr.push({
                     id: Date.now() + i * 2,
-                    icon: "http://krutna.ddns.net/static/gameIcon1.svg",
+                    icon: img,
                     name: "В разработке"
-                }])
+                });
             }
+            setListGames2(gemesArr);
         }
     }
-
-    useMemo(() => {
-        addingArray();
-    })
 
 
     return (
         <div className={classes.gamesList}>
             {listGames.map(game =>
                 <div className={classes.gamesItem} onClick={() => route("/games/" + game.id)} key={game.id}>
+                    <GameItem img={game.icon} title={game.name}/>
+                </div>
+            )}
+            {listGames2.map(game =>
+                <div className={classes.gamesItem} key={game.id}>
                     <GameItem img={game.icon} title={game.name}/>
                 </div>
             )}

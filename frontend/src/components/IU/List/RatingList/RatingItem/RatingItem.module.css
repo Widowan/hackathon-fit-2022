@@ -3,10 +3,38 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px;
-    max-width: 420px;
+    width: clamp(260px,50vw,460px);
+
 
     margin-top: 10px;
 
     /*font-family: "Intro Script R";*/
-    font-size: 32px;
+    font-size: clamp(14px,2vw,32px);
+
+}
+
+.avatar{
+    width: 10%;
+}
+
+.index{
+    width: 15%;
+    margin-left: 5%;
+}
+
+.nik{
+    width: 45%;
+    margin-left: 5%;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.nik:focus{
+    overflow: revert;
+    width: auto;
+}
+
+.balls{
+    width: 15%;
+    margin-left: 5%;
 }

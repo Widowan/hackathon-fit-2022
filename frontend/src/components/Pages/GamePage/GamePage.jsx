@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import classes from "./GamePage.module.css";
 import PageTitle from "../../IU/Text/PageTitle/PageTitle";
 import {useNavigate, useParams} from "react-router-dom";
@@ -6,15 +6,37 @@ import DescriptionMobile from "./DescriptionMobaile/DescriptionMobile";
 import ModalRating from "../../ModalWindows/ModalRating/ModalRating";
 import GameOne from "../../Games/GameOne/GameOne";
 import {BallsContext} from "../../../context";
+import Service from "../../../Service/Service";
 
 const GamePage = () => {
 
     const params = useParams();
     const route = useNavigate();
-    const [title, setTitle] = useState("Название игры")
+    const [gameInfo, setGameInfo] = useState({
+        title:"",
+        rules:""
+    });
     const [balls, setBalls] = useState(0)
+    const [check, setCheck] = useState(0)
+    const [status, setStatus] = useState({
+        days:0,
+        month:0
+    });
 
-    const fish = "Для современного мира новая модель организационной деятельности играет определяющее значение для первоочередных требований. Разнообразный и богатый опыт говорит нам, что понимание сути ресурсосберегающих технологий способствует повышению качества системы обучения кадров, соответствующей насущным потребностям.";
+    useEffect(()=>{
+        async function getStatus (){
+            const response = await Service.getStatusBalls(params.id)
+            const game = await Service.getGameById(params.id)
+            setStatus(response)
+            setGameInfo(game);
+            console.log(response);
+        }
+        getStatus();
+
+
+    },[check])
+
+    // const fish = "Для современного мира новая модель организационной деятельности играет определяющее значение для первоочередных требований. Разнообразный и богатый опыт говорит нам, что понимание сути ресурсосберегающих технологий способствует повышению качества системы обучения кадров, соответствующей насущным потребностям.";
 
     return (
         <div className={classes.gamePage}>
@@ -29,10 +51,10 @@ const GamePage = () => {
                 </svg>
 
                 <div className={classes.pageTitle}>
-                    <PageTitle text={title} />
+                    <PageTitle text={gameInfo.title} />
                 </div>
 
-                <div className={classes.svgMobile}><DescriptionMobile text={fish}/></div>
+                <div className={classes.svgMobile}><DescriptionMobile text={gameInfo.rules}/></div>
 
 
             </div>
@@ -41,34 +63,34 @@ const GamePage = () => {
                 <div className={classes.description}>
                     <div className={classes.descriptionTitle}>Правила</div>
                     <div className={classes.descriptionText}>
-                        {fish}
+                        {gameInfo.rules}
                     </div>
 
                 </div>
                 <BallsContext.Provider value={{
-                    balls, setBalls
+                    balls, setBalls, check, setCheck
                 }}>
                 <div className={classes.game}>
-                    <GameOne id={1}/>
+                    <GameOne id={params.id}/>
                 </div>
                 <div className={classes.status}>
                     <div className={classes.statusTitle}>
                         <div className={classes.modalRating}></div>
-                        <div className={classes.descriptionTitle}>Статус</div>
+                        <div className={classes.descriptionTitle}>Статистика</div>
                         <div className={classes.modalRating}><ModalRating id={params.id}/></div>
                     </div>
 
                     <div className={classes.statusInfo}>
                     <div className={classes.descriptionTitle}>
                         <div className={classes.balls}>{balls+" б."}</div>
-                        <div>Текщии</div>
+                        <div>Текущие</div>
                     </div>
                     <div className={classes.descriptionTitle}>
-                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div className={classes.balls}>{status.days+" б."}</div>
                         <div>За день</div>
                     </div>
                     <div className={classes.descriptionTitle}>
-                        <div className={classes.balls}>{balls+" б."}</div>
+                        <div className={classes.balls}>{status.days+" б."}</div>
                         <div>За неделю</div>
                     </div>
 

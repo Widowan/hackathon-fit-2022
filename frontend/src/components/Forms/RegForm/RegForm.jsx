@@ -138,7 +138,7 @@ const RegForm = () => {
                 <InputOne value={password} type="password" onChange={(event) => setPassword(event.target.value)}
                           type="password" placeholder="Пароль"/>
 
-                <div className={error2.error ? classes.error : classes.noError}>Неправелное имя или пароль!</div>
+                <div className={error2.error ? classes.error : classes.noError}>Неправильное имя или пароль!</div>
                 <div className={error2.notFilled ? classes.error : classes.noError}>Не все поля заполнены!</div>
                 <div className={classes.razdelitel}></div>
                 <InputOne disabled style={{opacity: 0}} placeholder="Повторите пароль"/>

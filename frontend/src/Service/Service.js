@@ -72,14 +72,75 @@ export default class Service {
 
         }catch (error){
 
-            console.log("error")
+            console.log(error)
+            const chek = await Api.getMe()
+            // if(chek.isError){
+            //     localStorage.removeItem("token")
+            //     Document.location.reload();
+            //     return true;
+            // }
+            return false
+        }
+    }
+
+    static async getStatusBalls(gameId){
+        try {
+
+            const result1 = await Api.getBalls(1,gameId);
+            const result2 = await Api.getBalls(7,gameId);
+            return {
+                days: result1.data.gameTotalResult.sumScore,
+                month: result2.data.gameTotalResult.sumScore,
+            };
+
+        }catch (error){
+
+            console.log(error.message)
             const chek = await Api.getMe()
             if(chek.isError){
                 localStorage.removeItem("token")
                 Document.location.reload();
-                return true;
+                return {
+                    days:"Ошибка подгрузки",
+                    month:"Ошибка подгрузки"
+                };
             }
-            return false
+            if (error.message =="Request failed with status code 401")
+                return {
+                days:0,
+                month:0
+            };
+        }
+    }
+
+    static async getLeaderBoard(gameId){
+        try {
+
+            const result = await Api.getLeaderBoard(gameId);
+            return result.data.leaderboard;
+
+        }catch (error){
+
+            return {"userId": "error",
+                "place": 1,
+                "sumScore": "error",
+                "username": "error"}
+        }
+    }
+
+    static async getGameById(gameId){
+        try {
+
+            const result = await Api.getGameById(gameId);
+            return {
+               title: result.data.game.name,
+                rules: result.data.game.rules
+            }
+
+        }catch (error){
+
+            return {"title": "Ошибка подгрузки",
+                "rules": "Ошибка подгрузки"}
         }
     }
 

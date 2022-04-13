@@ -5,10 +5,11 @@
     align-items: center;
 }
 
+
 .gameItem img{
     width: 100%;
 
-    border: 3px solid #2F50C4;
+    /*border: 3px solid #2F50C4;*/
     box-sizing: border-box;
     border-radius: 19px;
 }
@@ -17,7 +18,7 @@
     text-align: center;
     margin-top: 10px;
     font-family: 'Intro Regular';
-    font-size: clamp(16px,1.2vw,32px);;
+    font-size: clamp(16px,1.2vw,32px);
 
     color: #A0ABBC;
 

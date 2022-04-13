@@ -33,9 +33,15 @@ const Header = () => {
             </div>
 
             <div className={token? classes.info: classes.infoBlur}>
-                <div>{user.name}</div>
-                <CircleAvatar src="http://krutna.ddns.net/static/default.svg"></CircleAvatar>
-                <div onClick={exit}><CircleAvatar src={exitIcon}></CircleAvatar></div>
+                <div className={classes.user} tabIndex={99999}>{user.name}</div>
+                <div className={classes.icon}>
+                    <div className={classes.avatar}>
+                        <CircleAvatar src="http://krutna.ddns.net/static/default.svg"/>
+                    </div>
+
+                    <div className={classes.exit} onClick={exit}><CircleAvatar src={exitIcon}></CircleAvatar></div>
+                </div>
+
 
             </div>
         </div>

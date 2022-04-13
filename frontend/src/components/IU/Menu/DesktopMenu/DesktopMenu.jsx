@@ -5,8 +5,8 @@ import {Link} from "react-router-dom";
 const DesktopMenu = () => {
     return (
         <div className={classes.desktopMenu}>
-            <Link to="/auth" className={classes.startLink}>Меню</Link>
-            <Link to="/auth" className={classes.link}>Личный кабинет</Link>
+            <div to="/auth" className={classes.startLink}>Меню</div>
+            <Link to="/office" className={classes.link}>Личный кабинет</Link>
             <Link to="/games" className={classes.link}>Игры / Тренажёры</Link>
             {/*<Link to="/auth" className={classes.link}>Ретинг</Link>*/}
             {/*<Link to="/auth" className={classes.endLink}>О проекте</Link>*/}
