@@ -142,17 +142,15 @@ public class GameResultRepository {
 
     public GameResultRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.gameResultRowMapper = (rs, rowNum) -> {
-            var rowGameResult = new GameResult();
-            rowGameResult.setId(rs.getInt("id"));
-            rowGameResult.setUserId(rs.getInt("user_id"));
-            rowGameResult.setGameId(rs.getInt("game_id"));
-            rowGameResult.setResult(rs.getBoolean("result"));
-            rowGameResult.setScore(rs.getInt("score"));
-            rowGameResult.setTimeElapsed(rs.getFloat("time_elapsed"));
-            rowGameResult.setDateTimestamp(rs.getInt("date_timestamp"));
-            return rowGameResult;
-        };
+        this.gameResultRowMapper = (rs, rowNum) -> ImmutableGameResult.builder()
+                .id(rs.getInt("id"))
+                .gameId(rs.getInt("game_id"))
+                .userId(rs.getInt("user_id"))
+                .dateTimestamp(rs.getInt("date_timestamp"))
+                .score(rs.getInt("score"))
+                .result(rs.getBoolean("result"))
+                .timeElapsed(rs.getFloat("time_elapsed"))
+                .build();
         this.leaderboardRowRowMapper = (rs, rowNum) -> {
             var leaderboardRow = new LeaderboardRow();
             leaderboardRow.setUserId(rs.getInt("user_id"));
