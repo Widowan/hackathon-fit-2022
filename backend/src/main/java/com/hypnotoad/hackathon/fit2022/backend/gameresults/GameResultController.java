@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,7 +66,6 @@ public class GameResultController {
         return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
     }
 
-//    @PostMapping("/api/addGameResult")
     @GetMapping("/api/addGameResult")
     public ResponseEntity<Response> addGameResult(@RequestParam String token,
             @RequestParam int gameId, @RequestParam boolean result,

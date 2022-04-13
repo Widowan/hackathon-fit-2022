@@ -50,11 +50,11 @@ public class GameResultRepository {
     public GameResult createGameResult(int userId, int gameId,
             boolean result, int score, float timeElapsed
     ) {
-        var sql =
-                "INSERT INTO " +
-                    "GameResults(user_id, game_id, result, score, time_elapsed) " +
-                "VALUES " +
-                    "(?, ?, ?, ?, ?)";
+        var sql = """
+                INSERT INTO
+                    GameResults(user_id, game_id, result, score, time_elapsed)
+                VALUES
+                    (?, ?, ?, ?, ?)""";
 
         try {
             var upd = jdbc.update(sql, userId, gameId, result, score, timeElapsed);
@@ -71,40 +71,42 @@ public class GameResultRepository {
     }
 
     public List<LeaderboardRow> getLeaderboard(int userId, int gameId) {
-        var sql = "WITH SummedScoreTable AS (                                  " +
-                "    SELECT                                                    " +
-                "        user_id,                                              " +
-                "        game_id,                                              " +
-                "        SUM(score) AS sum_score                               " +
-                "    FROM GameResults                                          " +
-                "    WHERE game_id = ?                                         " +
-                "    GROUP BY user_id, game_id                                 " +
-                "),                                                            " +
-                "PlacedScoreBoard AS (                                         " +
-                "    SELECT                                                    " +
-                "        user_id,                                              " +
-                "        Row_Number() OVER (ORDER BY sum_score DESC) AS place, " +
-                "        sum_score                                             " +
-                "    FROM SummedScoreTable                                     " +
-                "),                                                            " +
-                "UsernameTable AS (                                            " +
-                "    SELECT                                                    " +
-                "        id,                                                   " +
-                "        username                                              " +
-                "    FROM Users                                                " +
-                ")                                                             " +
-                "SELECT                                                        " +
-                "    user_id, place, sum_score, username                       " +
-                "FROM                                                          " +
-                "    PlacedScoreboard p                                        " +
-                "LEFT JOIN UsernameTable u                                     " +
-                "    ON p.user_id = u.id                                       " +
-                "WHERE                                                         " +
-                "    place <= 10                                               " +
-                "    OR p.user_id = ?                                          " +
-                "ORDER BY                                                      " +
-                "    place                                                     " +
-                ";                                                             ";
+        var sql = """
+                WITH SummedScoreTable AS (
+                    SELECT
+                        user_id,
+                        game_id,
+                        SUM(score) AS sum_score
+                    FROM GameResults
+                    WHERE game_id = ?
+                    GROUP BY user_id, game_id
+                ),
+                PlacedScoreBoard AS (
+                    SELECT
+                        user_id,
+                        Row_Number() OVER (ORDER BY sum_score DESC) AS place,
+                        sum_score
+                    FROM SummedScoreTable
+                ),
+                UsernameTable AS (
+                    SELECT
+                        id,
+                        username
+                    FROM Users
+                )
+                SELECT
+                    user_id, place, sum_score, username
+                FROM
+                    PlacedScoreboard p
+                LEFT JOIN UsernameTable u
+                    ON p.user_id = u.id
+                WHERE
+                    place <= 10
+                    OR p.user_id = ?
+                ORDER BY
+                    place
+                ;
+                """;
         try {
             return jdbc.query(sql, leaderboardRowRowMapper, gameId, userId);
         } catch (DataAccessException e) {
@@ -115,23 +117,24 @@ public class GameResultRepository {
     }
 
     public GameTotalResult findGameTotalResultForDays(int userId, int gameId, int days) {
-        var sql = "WITH DatesTable AS (                                              " +
-                "    SELECT                                                          " +
-                "        user_id,                                                    " +
-                "        game_id,                                                    " +
-                "        score,                                                      " +
-                "        date_timestamp                                              " +
-                "    FROM GameResults                                                " +
-                "    WHERE (extract(epoch from now())::Integer - date_timestamp) < ? " +
-                ")                                                                   " +
-                "SELECT                                                              " +
-                "    user_id,                                                        " +
-                "    game_id,                                                        " +
-                "    SUM(score) as sum_score                                         " +
-                "FROM DatesTable                                                     " +
-                "GROUP BY user_id, game_id                                           " +
-                "HAVING user_id = ? AND game_id = ?                                  " +
-                ";                                                                   ";
+        var sql = """
+                WITH DatesTable AS (
+                    SELECT
+                        user_id,
+                        game_id,
+                        score,
+                        date_timestamp
+                    FROM GameResults
+                    WHERE (extract(epoch from now())::Integer - date_timestamp) < ?
+                )
+                SELECT
+                    user_id,
+                    game_id,
+                    SUM(score) as sum_score
+                FROM DatesTable
+                GROUP BY user_id, game_id
+                HAVING user_id = ? AND game_id = ?
+                """;
         try {
             return jdbc.queryForObject(sql, totalResultRowMapper,
             days*24*60*60, userId, gameId);
@@ -142,31 +145,25 @@ public class GameResultRepository {
 
     public GameResultRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.gameResultRowMapper = (rs, rowNum) -> {
-            var rowGameResult = new GameResult();
-            rowGameResult.setId(rs.getInt("id"));
-            rowGameResult.setUserId(rs.getInt("user_id"));
-            rowGameResult.setGameId(rs.getInt("game_id"));
-            rowGameResult.setResult(rs.getBoolean("result"));
-            rowGameResult.setScore(rs.getInt("score"));
-            rowGameResult.setTimeElapsed(rs.getFloat("time_elapsed"));
-            rowGameResult.setDateTimestamp(rs.getInt("date_timestamp"));
-            return rowGameResult;
-        };
-        this.leaderboardRowRowMapper = (rs, rowNum) -> {
-            var leaderboardRow = new LeaderboardRow();
-            leaderboardRow.setUserId(rs.getInt("user_id"));
-            leaderboardRow.setUsername(rs.getString("username"));
-            leaderboardRow.setSumScore(rs.getInt("sum_score"));
-            leaderboardRow.setPlace(rs.getInt("place"));
-            return leaderboardRow;
-        };
-        this.totalResultRowMapper = (rs, rowNum) -> {
-            var totalResult = new GameTotalResult();
-            totalResult.setGameId(rs.getInt("game_id"));
-            totalResult.setSumScore(rs.getInt("sum_score"));
-            totalResult.setUserId(rs.getInt("user_id"));
-            return totalResult;
-        };
+        this.gameResultRowMapper = (rs, rowNum) -> ImmutableGameResult.builder()
+                .id(rs.getInt("id"))
+                .userId(rs.getInt("user_id"))
+                .gameId(rs.getInt("game_id"))
+                .result(rs.getBoolean("result"))
+                .score(rs.getInt("score"))
+                .timeElapsed(rs.getFloat("time_elapsed"))
+                .dateTimestamp(rs.getInt("date_timestamp"))
+                .build();
+        this.leaderboardRowRowMapper = (rs, rowNum) -> ImmutableLeaderboardRow.builder()
+                .userId(rs.getInt("user_id"))
+                .place(rs.getInt("place"))
+                .sumScore(rs.getInt("sum_score"))
+                .username(rs.getString("username"))
+                .build();
+        this.totalResultRowMapper = (rs, rowNum) -> ImmutableGameTotalResult.builder()
+                .userId(rs.getInt("user_id"))
+                .gameId(rs.getInt("game_id"))
+                .sumScore(rs.getInt("sum_score"))
+                .build();
     }
 }

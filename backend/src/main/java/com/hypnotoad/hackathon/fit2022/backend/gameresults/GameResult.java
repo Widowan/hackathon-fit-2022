@@ -1,69 +1,16 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
-public class GameResult {
-    private int id;
-    private int userId;
-    private int gameId;
-    private boolean result;
-    private int score;
-    private float timeElapsed;
-    private int dateTimestamp;
+import com.hypnotoad.hackathon.fit2022.backend.configurations.JsonEntityStyle;
+import org.immutables.value.Value;
 
-    public GameResult() {}
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public boolean isResult() {
-        return result;
-    }
-
-    public void setResult(boolean result) {
-        this.result = result;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public float getTimeElapsed() {
-        return timeElapsed;
-    }
-
-    public void setTimeElapsed(float timeElapsed) {
-        this.timeElapsed = timeElapsed;
-    }
-
-    public int getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
-    }
-
-    public int getDateTimestamp() {
-        return dateTimestamp;
-    }
-
-    public void setDateTimestamp(int dateTimestamp) {
-        this.dateTimestamp = dateTimestamp;
-    }
+@Value.Immutable
+@JsonEntityStyle
+public abstract class GameResult {
+    abstract int     getId();
+    abstract int     getUserId();
+    abstract int     getGameId();
+    abstract boolean getResult();
+    abstract int     getScore();
+    abstract float   getTimeElapsed();
+    abstract int     getDateTimestamp();
 }

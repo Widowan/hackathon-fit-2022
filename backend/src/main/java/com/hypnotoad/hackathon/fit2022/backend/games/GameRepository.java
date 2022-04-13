@@ -50,14 +50,12 @@ public class GameRepository {
 
     public GameRepository(String staticUrl, JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.gameRowMapper = (rs, rowNum) -> {
-            Game rowGame = new Game();
-            rowGame.setId(rs.getInt("id"));
-            rowGame.setName(rs.getString("name"));
-            rowGame.setDescription(rs.getString("description"));
-            rowGame.setRules(rs.getString("rules"));
-            rowGame.setIcon(staticUrl + rs.getString("icon"));
-            return rowGame;
-        };
+        this.gameRowMapper = (rs, rowNum) -> ImmutableGame.builder()
+                .id(rs.getInt("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .rules(rs.getString("rules"))
+                .icon(staticUrl + rs.getString("icon"))
+                .build();
     }
 }

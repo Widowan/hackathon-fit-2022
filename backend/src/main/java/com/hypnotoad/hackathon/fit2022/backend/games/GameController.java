@@ -1,9 +1,9 @@
 package com.hypnotoad.hackathon.fit2022.backend.games;
 
 import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
+import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.responses.game.AllGamesResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.game.GameResponse;
-import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
