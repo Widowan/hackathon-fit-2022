@@ -2,7 +2,6 @@ package com.hypnotoad.hackathon.fit2022.backend.users;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,13 +16,11 @@ public class UserRepository {
 
     public UserRepository(String staticUrl, JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.userRowMapper = (r, i) -> {
-            User rowUser = new User();
-            rowUser.setId(r.getInt("id"));
-            rowUser.setUsername(r.getString("username"));
-            rowUser.setAvatar(staticUrl + r.getString("avatar"));
-            return rowUser;
-        };
+        this.userRowMapper = (rs, rowNum) -> ImmutableUser.builder()
+                .id(rs.getInt("id"))
+                .username(rs.getString("username"))
+                .avatar(rs.getString("avatar"))
+                .build();
     }
 
     public User createUser(String username, String passwordHash) {

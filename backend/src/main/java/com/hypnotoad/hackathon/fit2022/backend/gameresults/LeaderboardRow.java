@@ -1,13 +1,10 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hypnotoad.hackathon.fit2022.backend.configurations.JsonEntityStyle;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableLeaderboardRow.class)
-@JsonSerialize(as = ImmutableLeaderboardRow.class)
 @Value.Immutable
-@Value.Style(stagedBuilder = true)
+@JsonEntityStyle
 abstract public class LeaderboardRow {
     abstract int    getUserId();
     abstract int    getPlace();

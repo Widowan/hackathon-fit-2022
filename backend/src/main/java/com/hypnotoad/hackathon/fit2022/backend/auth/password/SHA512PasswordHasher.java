@@ -1,6 +1,5 @@
 package com.hypnotoad.hackathon.fit2022.backend.auth.password;
 
-import com.hypnotoad.hackathon.fit2022.backend.auth.password.PasswordHasher;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;

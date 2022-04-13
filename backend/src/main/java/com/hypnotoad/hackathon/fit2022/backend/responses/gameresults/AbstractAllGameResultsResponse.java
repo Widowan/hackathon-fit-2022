@@ -10,5 +10,5 @@ import java.util.List;
 @Value.Immutable
 @ResponseStyle
 abstract public class AbstractAllGameResultsResponse extends Response {
-    abstract List<GameResult> getGameResults();
+    abstract public List<GameResult> getGameResults();
 }

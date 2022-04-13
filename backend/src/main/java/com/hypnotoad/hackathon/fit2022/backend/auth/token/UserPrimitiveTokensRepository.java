@@ -20,13 +20,11 @@ public class UserPrimitiveTokensRepository {
 
     static final Logger log = LoggerFactory.getLogger(UserPrimitiveTokensRepository.class);
 
-    private final RowMapper<PrimitiveToken> tokenRowMapper = (rs, rowNum) -> {
-        var pt = new PrimitiveToken();
-        pt.setUserId(rs.getInt("user_id"));
-        pt.setToken(rs.getString("token"));
-        pt.setExpiryTimestamp(rs.getLong("timestamp"));
-        return pt;
-    };
+    private final RowMapper<PrimitiveToken> tokenRowMapper = (rs, rowNum) -> ImmutablePrimitiveToken.builder()
+            .userId(rs.getInt("user_id"))
+            .token(rs.getString("token"))
+            .expiryTimestamp(rs.getInt("timestamp"))
+            .build();
 
     public PrimitiveToken findByUser(User user) {
         var sql = "SELECT * FROM UserTokens WHERE user_id = ?";
@@ -55,10 +53,11 @@ public class UserPrimitiveTokensRepository {
         var token = primitiveTokenProvider.create();
         while (validateTokenNoProlong(token)) token = primitiveTokenProvider.create();
 
-        var pt = new PrimitiveToken();
-        pt.setToken(token);
-        pt.setUserId(user.getId());
-        pt.setExpiryTimestamp(Instant.now().getEpochSecond() + tokenLifespanSeconds);
+        var pt = ImmutablePrimitiveToken.builder()
+                .userId(user.getId())
+                .token(token)
+                .expiryTimestamp(Instant.now().getEpochSecond() + tokenLifespanSeconds)
+                .build();
 
         var sql = "INSERT INTO UserTokens VALUES (?, ?, ?)";
 

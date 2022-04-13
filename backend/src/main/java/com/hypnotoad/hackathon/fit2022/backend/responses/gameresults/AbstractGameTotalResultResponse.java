@@ -8,5 +8,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @ResponseStyle
 abstract public class AbstractGameTotalResultResponse extends Response {
-    abstract GameTotalResult getGameTotalResult();
+    abstract public GameTotalResult getGameTotalResult();
 }

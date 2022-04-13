@@ -6,6 +6,6 @@ import org.immutables.value.Value;
 @Value.Immutable
 @ResponseStyle
 abstract public class AbstractFailResponse extends Response {
-    abstract String getReason();
+    abstract public String getReason();
     public boolean getOk() { return false; }
 }

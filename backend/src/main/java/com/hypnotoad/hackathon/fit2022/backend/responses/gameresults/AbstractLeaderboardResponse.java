@@ -10,5 +10,5 @@ import java.util.List;
 @Value.Immutable
 @ResponseStyle
 abstract public class AbstractLeaderboardResponse extends Response {
-    abstract List<LeaderboardRow> getLeaderboard();
+    abstract public List<LeaderboardRow> getLeaderboard();
 }

@@ -6,5 +6,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @ResponseStyle
 abstract public class AbstractSuccessResponse extends Response {
-    abstract String getMessage();
+    abstract public String getMessage();
 }
