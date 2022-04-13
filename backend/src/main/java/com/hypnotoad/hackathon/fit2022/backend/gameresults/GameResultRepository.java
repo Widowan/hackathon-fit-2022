@@ -144,21 +144,19 @@ public class GameResultRepository {
         this.jdbc = jdbc;
         this.gameResultRowMapper = (rs, rowNum) -> ImmutableGameResult.builder()
                 .id(rs.getInt("id"))
-                .gameId(rs.getInt("game_id"))
                 .userId(rs.getInt("user_id"))
-                .dateTimestamp(rs.getInt("date_timestamp"))
-                .score(rs.getInt("score"))
+                .gameId(rs.getInt("game_id"))
                 .result(rs.getBoolean("result"))
+                .score(rs.getInt("score"))
                 .timeElapsed(rs.getFloat("time_elapsed"))
+                .dateTimestamp(rs.getInt("date_timestamp"))
                 .build();
-        this.leaderboardRowRowMapper = (rs, rowNum) -> {
-            var leaderboardRow = new LeaderboardRow();
-            leaderboardRow.setUserId(rs.getInt("user_id"));
-            leaderboardRow.setUsername(rs.getString("username"));
-            leaderboardRow.setSumScore(rs.getInt("sum_score"));
-            leaderboardRow.setPlace(rs.getInt("place"));
-            return leaderboardRow;
-        };
+        this.leaderboardRowRowMapper = (rs, rowNum) -> ImmutableLeaderboardRow.builder()
+                .userId(rs.getInt("user_id"))
+                .place(rs.getInt("place"))
+                .sumScore(rs.getInt("sum_score"))
+                .username(rs.getString("username"))
+                .build();
         this.totalResultRowMapper = (rs, rowNum) -> {
             var totalResult = new GameTotalResult();
             totalResult.setGameId(rs.getInt("game_id"));

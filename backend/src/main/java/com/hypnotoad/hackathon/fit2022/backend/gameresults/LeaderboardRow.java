@@ -1,42 +1,16 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
-public class LeaderboardRow {
-    private int userId;
-    private int place;
-    private int sumScore;
-    private String username;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    public LeaderboardRow() {}
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public int getSumScore() {
-        return sumScore;
-    }
-
-    public void setSumScore(int sumScore) {
-        this.sumScore = sumScore;
-    }
-
-    public int getPlace() {
-        return place;
-    }
-
-    public void setPlace(int place) {
-        this.place = place;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+@JsonDeserialize(as = ImmutableLeaderboardRow.class)
+@JsonSerialize(as = ImmutableLeaderboardRow.class)
+@Value.Immutable
+@Value.Style(stagedBuilder = true)
+abstract public class LeaderboardRow {
+    abstract int    getUserId();
+    abstract int    getPlace();
+    abstract int    sumScore();
+    abstract String getUsername();
 }
