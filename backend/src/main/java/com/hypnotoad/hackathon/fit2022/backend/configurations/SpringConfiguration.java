@@ -1,4 +1,4 @@
-package com.hypnotoad.hackathon.fit2022.backend;
+package com.hypnotoad.hackathon.fit2022.backend.configurations;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @PropertySource("classpath:datasourceSecrets.properties")
-public class ProjectConfiguration {
+public class SpringConfiguration {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
