@@ -1,6 +1,8 @@
 package com.hypnotoad.hackathon.fit2022.backend.auth.token;
 
 import com.hypnotoad.hackathon.fit2022.backend.users.User;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,28 +28,23 @@ public class UserPrimitiveTokensRepository {
             .expiryTimestamp(rs.getInt("timestamp"))
             .build();
 
-    public PrimitiveToken findByUser(User user) {
+    public Option<PrimitiveToken> findByUser(User user) {
         var sql = "SELECT * FROM UserTokens WHERE user_id = ?";
 
-        try {
-            return jdbc.queryForObject(sql, tokenRowMapper, user.getId());
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, tokenRowMapper, user.getId()))
+                .onFailure(e -> log.error("findByUser failed", e))
+                .toOption();
     }
 
-    public PrimitiveToken findByToken(String token) {
+    public Option<PrimitiveToken> findByToken(String token) {
         var sql = "SELECT * FROM UserTokens WHERE token = ?";
 
-        try {
-            return jdbc.queryForObject(sql, tokenRowMapper, token);
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, tokenRowMapper, token))
+                .onFailure(e -> log.error("findByToken failed", e))
+                .toOption();
     }
 
-    public PrimitiveToken createToken(User user) {
-        log.debug("Creating token for user: {}", user);
+    public Option<? extends PrimitiveToken> createToken(User user) {
         deleteTokenByUser(user);
 
         var token = primitiveTokenProvider.create();
@@ -61,13 +58,10 @@ public class UserPrimitiveTokensRepository {
 
         var sql = "INSERT INTO UserTokens VALUES (?, ?, ?)";
 
-        try {
-            jdbc.update(sql, pt.getUserId(), pt.getToken(), pt.getExpiryTimestamp());
-        } catch (DataAccessException e) {
-            log.error("Couldn't insert token into DB", e);
-        }
-
-        return pt;
+        return Try.of(() -> jdbc.update(sql, pt.getUserId(), pt.getToken(), pt.getExpiryTimestamp()))
+                .onFailure(e -> log.error("createToken failed:", e))
+                .map(x -> pt)
+                .toOption();
     }
 
     public boolean deleteTokenByUser(User user) {
@@ -78,14 +72,14 @@ public class UserPrimitiveTokensRepository {
         var isValid = primitiveTokenProvider.isValid(token);
         if (!isValid) return false;
 
-        var sql = "UPDATE UserTokens " +
-                "SET   expire_time = extract(epoch FROM now()) + ? " +
-                "WHERE token = ?";
-        try {
-            return jdbc.update(sql, tokenLifespanSeconds, token) > 0;
-        } catch (DataAccessException ignored) {}
+        var sql = """
+                UPDATE UserTokens
+                SET expire_time = extract(epoch FROM now()) + ?
+                WHERE token = ?""";
 
-        return true;
+        return Try.of(() -> jdbc.update(sql, tokenLifespanSeconds, token))
+                .map(x -> x > 0)
+                .getOrElse(false);
     }
 
     public boolean validateTokenNoProlong(String token) {

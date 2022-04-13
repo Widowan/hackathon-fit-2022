@@ -35,7 +35,7 @@ public class GameResultController {
         }
 
         var user = userRepository.findByToken(token);
-        var gameResults = gameResultRepository.findAllByUserId(user.getId());
+        var gameResults = gameResultRepository.findAllByUserId(user.get().getId());
         if (gameResults == null) {
             log.debug("Found null, expected empty list");
             return ResponseEntity.status(500).body(new FailResponse("Couldn't access the database"));
@@ -56,7 +56,7 @@ public class GameResultController {
         }
 
         var user = userRepository.findByToken(token);
-        var gameResults = gameResultRepository.findAllByUserId(user.getId());
+        var gameResults = gameResultRepository.findAllByUserId(user.get().getId());
         if (gameResults == null) {
             log.debug("Found null, expected empty list");
             return ResponseEntity.status(500).body(new FailResponse("Couldn't access the database"));
@@ -87,7 +87,7 @@ public class GameResultController {
 
         var user = userRepository.findByToken(token);
         var gameResult = gameResultRepository.createGameResult(
-                user.getId(), gameId, result, score, timeElapsed);
+                user.get().getId(), gameId, result, score, timeElapsed);
         if (gameResult == null) {
             return ResponseEntity.status(500).body(new FailResponse("Couldn't create database entry"));
         }
@@ -123,7 +123,7 @@ public class GameResultController {
         }
 
         var user = userRepository.findByToken(token);
-        var leaderboard = gameResultRepository.getLeaderboard(user.getId(), gameId);
+        var leaderboard = gameResultRepository.getLeaderboard(user.get().getId(), gameId);
         if (leaderboard == null) {
             log.debug("Expected empty list, got null");
             return ResponseEntity.status(500).body(new FailResponse("Couldn't connect to database"));
@@ -152,7 +152,7 @@ public class GameResultController {
 
         var user = userRepository.findByToken(token);
         var gameResults = gameResultRepository.findGameTotalResultForDays(
-                user.getId(), gameId, days);
+                user.get().getId(), gameId, days);
         if (gameResults == null) {
             log.debug("Nothing found");
             return ResponseEntity.status(401).body(new FailResponse("Nothing found"));

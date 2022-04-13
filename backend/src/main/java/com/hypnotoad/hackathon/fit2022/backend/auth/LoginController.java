@@ -10,6 +10,7 @@ import com.hypnotoad.hackathon.fit2022.backend.responses.auth.GetMeResponse;
 import com.hypnotoad.hackathon.fit2022.backend.users.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,35 +25,39 @@ public class LoginController {
     UserPrimitiveTokensRepository userPrimitiveTokensRepository;
     static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
+
     @GetMapping("/api/signUp")
     @PostMapping("/api/signUp")
-    public ResponseEntity<Response> signUp(
+    public ResponseEntity<? extends Response> signUp(
             @RequestParam String username,
             @RequestParam String password
     ) {
         log.debug("signUp issued by user {}", username);
+
+        // TODO: Move everything to strings in resources
 
         if (username.isBlank() || password.isBlank()) {
             log.debug("Empty fields are not allowed");
             return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
         }
 
-        var exists = userRepository.findByUsername(username);
-        if (exists != null) {
-            log.debug("Such user already exists");
+        var user = userRepository.findByUsername(username)
+                .peek(ig -> log.debug("Such user already exists"));
+        if (user.isDefined())
             return ResponseEntity.status(401).body(new FailResponse("User already exists"));
-        }
 
-        var password_hash = passwordHasher.hash(password);
-        var user = userRepository.createUser(username, password_hash);
-        if (user == null)
+        var passwordHash = passwordHasher.hash(password);
+        var createdUser = userRepository.createUser(username, passwordHash)
+                .onEmpty(() -> log.error("Couldn't create user"));
+        if (createdUser.isEmpty())
             return ResponseEntity.status(500).body(new FailResponse("Couldn't create user"));
-        log.debug("Created user: {}", user);
 
-        var token = userPrimitiveTokensRepository.createToken(user);
-        log.debug("Created token: {}", token);
+        var token = userPrimitiveTokensRepository.createToken(user.get())
+                .onEmpty(() -> log.error("Couldn't create token"));
+        if (token.isEmpty())
+            return ResponseEntity.status(500).body(new FailResponse("Couldn't create token"));
 
-        return ResponseEntity.status(200).body(new AuthResponse(token.getToken()));
+        return ResponseEntity.status(200).body(new AuthResponse(token.get().getToken()));
     }
 
     @GetMapping("/api/signIn")
@@ -68,11 +73,10 @@ public class LoginController {
             return ResponseEntity.status(401).body(new FailResponse("Empty fields"));
         }
 
-        var user = userRepository.findByUsername(username);
-        if (user == null) {
-            log.debug("Such user doesn't exists");
+        var user = userRepository.findByUsername(username)
+                .onEmpty(() -> log.debug("User doesn't exists"));
+        if (user.isEmpty())
             return ResponseEntity.status(401).body(new FailResponse("User doesn't exists"));
-        }
 
         var password_hash = passwordHasher.hash(password);
         var valid = userRepository.validatePasswordHashByUsername(username, password_hash);
@@ -81,11 +85,12 @@ public class LoginController {
             return ResponseEntity.status(403).body(new FailResponse("Invalid credentials"));
         }
 
-        userPrimitiveTokensRepository.deleteTokenByUser(user);
-        var token = userPrimitiveTokensRepository.createToken(user);
-        log.debug("Created token: {}", token);
+        userPrimitiveTokensRepository.deleteTokenByUser(user.get());
+        var token = userPrimitiveTokensRepository.createToken(user.get())
+                .onEmpty(() -> log.error("Couldn't create token"));
 
-        return ResponseEntity.status(200).body(new AuthResponse(token.getToken()));
+        // TODO: Handle
+        return ResponseEntity.status(200).body(new AuthResponse(token.get().getToken()));
     }
 
     @GetMapping("/api/signOut")
@@ -99,7 +104,7 @@ public class LoginController {
         }
 
         var user = userRepository.findByToken(token);
-        var deleted = userPrimitiveTokensRepository.deleteTokenByUser(user);
+        var deleted = userPrimitiveTokensRepository.deleteTokenByUser(user.get());
         if (!deleted) {
             log.debug("Failed to expire token");
             return ResponseEntity.status(500).body(new FailResponse("Couldn't expire token"));
@@ -120,7 +125,7 @@ public class LoginController {
 
         var user = userRepository.findByToken(token);
 
-        return ResponseEntity.status(200).body(new GetMeResponse(user));
+        return ResponseEntity.status(200).body(new GetMeResponse(user.get()));
     }
 
     @GetMapping("/api/usernameIsUnique")
@@ -153,7 +158,7 @@ public class LoginController {
         }
 
         var user = userRepository.findByToken(token);
-        var success = userRepository.setAvatarByUserId(user.getId(), avatar);
+        var success = userRepository.setAvatarByUserId(user.get().getId(), avatar);
 
         if (!success) {
             return ResponseEntity.status(500).body(new FailResponse("Something went wrong"));
