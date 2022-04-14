@@ -48,7 +48,12 @@ public class UserPrimitiveTokensRepository {
         deleteTokenByUser(user);
 
         var token = primitiveTokenProvider.create();
-        while (validateTokenNoProlong(token)) token = primitiveTokenProvider.create();
+        Option<Boolean> exists = validateTokenNoProlong(token);
+        // Return None if db connection failed;
+        if (exists.isEmpty()) return Option.none();
+        // Retry until token is unique
+        // NOTE: It checks one extra time
+        while (validateTokenNoProlong(token).get()) token = primitiveTokenProvider.create();
 
         var pt = ImmutablePrimitiveToken.builder()
                 .userId(user.getId())
@@ -64,13 +69,13 @@ public class UserPrimitiveTokensRepository {
                 .toOption();
     }
 
-    public boolean deleteTokenByUser(User user) {
+    public Option<Boolean> deleteTokenByUser(User user) {
         return primitiveTokenProvider.expire(user);
     }
 
-    public boolean validateToken(String token) {
+    public Option<Boolean> validateToken(String token) {
         var isValid = primitiveTokenProvider.isValid(token);
-        if (!isValid) return false;
+        if (isValid.isEmpty()) return isValid;
 
         var sql = """
                 UPDATE UserTokens
@@ -79,10 +84,10 @@ public class UserPrimitiveTokensRepository {
 
         return Try.of(() -> jdbc.update(sql, tokenLifespanSeconds, token))
                 .map(x -> x > 0)
-                .getOrElse(false);
+                .toOption();
     }
 
-    public boolean validateTokenNoProlong(String token) {
+    public Option<Boolean> validateTokenNoProlong(String token) {
         return primitiveTokenProvider.isValid(token);
     }
 

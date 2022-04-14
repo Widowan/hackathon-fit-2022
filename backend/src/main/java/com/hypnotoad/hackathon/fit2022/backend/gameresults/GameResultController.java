@@ -29,7 +29,7 @@ public class GameResultController {
         log.debug("getAllGameResultsByUser issued with token {}", token);
 
         var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid) {
+        if (!valid.get()) {
             log.debug("Provided token is invalid");
             return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
@@ -50,7 +50,7 @@ public class GameResultController {
         log.debug("getGameResultsByUser issued with token {}", token);
 
         var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid) {
+        if (!valid.get()) {
             log.debug("Provided token is invalid");
             return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
@@ -74,7 +74,7 @@ public class GameResultController {
         log.debug("addGameResult issued with token {}", token);
 
         var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid) {
+        if (!valid.get()) {
             log.debug("Provided token is invalid");
             return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
@@ -111,7 +111,7 @@ public class GameResultController {
         log.debug("getLeaderboard issued with token {}", token);
 
         var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid) {
+        if (!valid.get()) {
             log.debug("Provided token is invalid");
             return  ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
@@ -139,7 +139,7 @@ public class GameResultController {
             @RequestParam int days
     ) {
         var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid) {
+        if (!valid.get()) {
             log.debug("Provided token is invalid");
             return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
         }
