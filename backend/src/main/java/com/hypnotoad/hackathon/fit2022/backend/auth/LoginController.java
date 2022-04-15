@@ -3,13 +3,13 @@ package com.hypnotoad.hackathon.fit2022.backend.auth;
 import com.hypnotoad.hackathon.fit2022.backend.auth.password.PasswordHasher;
 import com.hypnotoad.hackathon.fit2022.backend.auth.token.UserPrimitiveTokensRepository;
 import com.hypnotoad.hackathon.fit2022.backend.configurations.Strings;
-import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
-import com.hypnotoad.hackathon.fit2022.backend.responses.ResponseWrapper;
 import com.hypnotoad.hackathon.fit2022.backend.responses.SuccessResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.auth.AuthResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.auth.GetMeResponse;
 import com.hypnotoad.hackathon.fit2022.backend.users.UserRepository;
+import com.hypnotoad.hackathon.fit2022.backend.utils.Validator;
+import com.hypnotoad.hackathon.fit2022.backend.utils.wrappers.RepositoryWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +19,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// FIXME: Token checking into aspects
+
 @RestController
 public class LoginController {
-    UserRepository userRepository;
-    PasswordHasher passwordHasher;
-    UserPrimitiveTokensRepository userPrimitiveTokensRepository;
+    final UserRepository userRepository;
+    final PasswordHasher passwordHasher;
+    final UserPrimitiveTokensRepository userPrimitiveTokensRepository;
+
+    final Validator validator;
+    final RepositoryWrapper repositoryWrapper;
+
     @Autowired Strings strings;
     static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
@@ -36,31 +40,20 @@ public class LoginController {
     ) {
         log.debug("signUp issued by user {}", username);
 
-        if (username.isBlank() || password.isBlank()) {
-            log.debug(strings.emptyFields);
-            return ResponseWrapper.fail(401, strings.emptyFields);
-        }
+        var paramsInvalid = validator.params(username, password);
+        if (paramsInvalid.isDefined()) return paramsInvalid.get();
 
-        // Check if already exists
-        var user = userRepository.findByUsername(username)
-                .peek(ig -> log.debug(strings.userExists));
-        if (user.isDefined())
-            return ResponseWrapper.fail(401, strings.userExists);
+        var usernameInvalid = repositoryWrapper.userByUsername(username, false);
+        if (usernameInvalid.isLeft()) return usernameInvalid.getLeft();
 
-        // Create user if not
         var passwordHash = passwordHasher.hash(password);
-        var createdUser = userRepository.createUser(username, passwordHash)
-                .onEmpty(() -> log.debug(strings.cantCreateUser));
-        if (createdUser.isEmpty())
-            return ResponseWrapper.fail(500, strings.cantCreateToken);
+        var createdUser = repositoryWrapper.createUser(username, passwordHash);
+        if (createdUser.isEmpty()) return createdUser.getLeft();
 
-        // Create token to give
-        var token = userPrimitiveTokensRepository.createToken(createdUser.get())
-                .onEmpty(() -> log.debug(strings.cantCreateToken));
-        if (token.isEmpty())
-            return ResponseWrapper.fail(500, strings.cantCreateToken);
+        var createdToken = repositoryWrapper.createToken(createdUser.get());
+        if (createdToken.isEmpty()) return createdToken.getLeft();
 
-        return ResponseEntity.status(200).body(new AuthResponse(token.get().getToken()));
+        return ResponseEntity.status(200).body(new AuthResponse(createdToken.get().getToken()));
     }
 
     @GetMapping("/api/signIn")
@@ -71,60 +64,34 @@ public class LoginController {
     ) {
         log.debug("signIn issued by user {}", username);
 
-        if (username.isBlank() || password.isBlank()) {
-            log.debug(strings.emptyFields);
-            return ResponseWrapper.fail(401, strings.emptyFields);
-        }
+        var paramsInvalid = validator.params(username, password);
+        if (paramsInvalid.isDefined()) return paramsInvalid.get();
 
-        // Check if user even exists
-        var user = userRepository.findByUsername(username)
-                .onEmpty(() -> log.debug(strings.userNotExists));
-        if (user.isEmpty())
-            return ResponseWrapper.fail(401, strings.userNotExists);
+        var user = repositoryWrapper.userByUsername(username, true);
+        if (user.isLeft()) return user.getLeft();
 
-        // Check if password is valid
-        var password_hash = passwordHasher.hash(password);
-        var valid = userRepository.validatePasswordHashByUsername(username, password_hash)
-                .onEmpty(() -> log.debug(strings.passwordValidationFailed));
-        if (valid.isEmpty())
-            return ResponseWrapper.fail(500, strings.somethingWentWrong);
-        else if (!valid.get())
-            return ResponseWrapper.fail(403, strings.invalidCredentials);
+        var passwordHash = passwordHasher.hash(password);
+        var passwordInvalid = validator.passwordHash(username, passwordHash);
+        if (passwordInvalid.isDefined()) return passwordInvalid.get();
 
-        // Try to delete (invalidate) user's token
-        var deleted = userPrimitiveTokensRepository.deleteTokenByUser(user.get())
-                .onEmpty(() -> log.debug(strings.tokenNotDeleted));
-        if (deleted.isEmpty() || !deleted.get())
-            return ResponseEntity.status(500).body(new FailResponse(strings.somethingWentWrong));
+        var deletedToken = repositoryWrapper.deleteToken(user.get());
+        if (deletedToken.isLeft()) return deletedToken.getLeft();
 
-        // Create token
-        var token = userPrimitiveTokensRepository.createToken(user.get())
-                .onEmpty(() -> log.debug(strings.cantCreateToken));
-        if (token.isEmpty())
-            return ResponseEntity.status(500).body(new FailResponse(strings.somethingWentWrong));
+        var createdToken = repositoryWrapper.createToken(user.get());
+        if (createdToken.isLeft()) return createdToken.getLeft();
 
-        return ResponseEntity.status(200).body(new AuthResponse(token.get().getToken()));
+        return ResponseEntity.status(200).body(new AuthResponse(createdToken.get().getToken()));
     }
 
     @GetMapping("/api/signOut")
     public ResponseEntity<Response> signOut(@RequestParam String token) {
         log.debug("signOut issued by user with token {}", token);
 
-        // Check if token is valid
-        var valid = userPrimitiveTokensRepository.validateTokenNoProlong(token)
-                .onEmpty(() -> log.debug(strings.invalidToken));
-        if (valid.isEmpty())   return ResponseWrapper.fail(500, strings.somethingWentWrong);
-        else if (!valid.get()) return ResponseWrapper.fail(403, strings.invalidToken);
+        var user = repositoryWrapper.userByToken(token, false);
+        if (user.isEmpty()) return user.getLeft();
 
-        // Process user
-        var user = userRepository.findByToken(token)
-                .onEmpty(() -> log.debug(strings.userNotExists));
-        if (user.isEmpty()) return ResponseWrapper.fail(500, strings.userNotExists);
-
-        // Invalidate token
-        var deleted = userPrimitiveTokensRepository.deleteTokenByUser(user.get())
-                .onEmpty(() -> log.debug(strings.tokenNotDeleted));
-        if (deleted.isEmpty() || !deleted.get()) return ResponseWrapper.fail(500, strings.tokenNotDeleted);
+        var deletedToken = repositoryWrapper.deleteToken(user.get());
+        if (deletedToken.isLeft()) return deletedToken.getLeft();
 
         return ResponseEntity.status(200).body(new SuccessResponse("Success"));
     }
@@ -133,16 +100,8 @@ public class LoginController {
     public ResponseEntity<Response> getMe(@RequestParam String token) {
         log.debug("getMe issued by user with token {}", token);
 
-        // Check if token is valid
-        var valid = userPrimitiveTokensRepository.validateToken(token)
-                .onEmpty(() -> log.debug(strings.invalidToken));
-        if (valid.isEmpty())   return ResponseWrapper.fail(500, strings.somethingWentWrong);
-        else if (!valid.get()) return ResponseWrapper.fail(403, strings.invalidToken);
-
-        // Process user
-        var user = userRepository.findByToken(token)
-                .onEmpty(() -> log.debug(strings.userNotExists));
-        if (user.isEmpty()) return ResponseWrapper.fail(500, strings.userNotExists);
+        var user = repositoryWrapper.userByToken(token, true);
+        if (user.isEmpty()) return user.getLeft();
 
         return ResponseEntity.status(200).body(new GetMeResponse(user.get()));
     }
@@ -151,8 +110,8 @@ public class LoginController {
     public ResponseEntity<Response> usernameIsUnique(@RequestParam String username) {
         log.debug("usernameIsUnique issued by user {}", username);
 
-        var unique = userRepository.findByUsername(username);
-        if (unique.isDefined()) return ResponseWrapper.fail(401, strings.usernameNotUnique);
+        var unique = repositoryWrapper.userByUsername(username, false);
+        if (unique.isEmpty()) return unique.getLeft();
 
         return ResponseEntity.status(200).body(new SuccessResponse(strings.usernameUnique));
     }
@@ -162,23 +121,14 @@ public class LoginController {
     public ResponseEntity<Response> setAvatar(@RequestParam String token, @RequestParam String avatar) {
         log.debug("setAvatar issued with token {} and avatar {}", token, avatar);
 
-        var valid = userPrimitiveTokensRepository.validateToken(token)
-                .onEmpty(() -> log.debug(strings.invalidToken));
-        if (valid.isEmpty()) return ResponseWrapper.fail(500, strings.somethingWentWrong);
-        else if (!valid.get()) return ResponseWrapper.fail(403, strings.invalidToken);
+        var paramsInvalid = validator.params(avatar);
+        if (paramsInvalid.isDefined()) return paramsInvalid.get();
 
-        if (avatar.isBlank()) {
-            log.debug(strings.emptyFields);
-            return ResponseWrapper.fail(401, strings.emptyFields);
-        }
+        var user = repositoryWrapper.userByToken(token, true);
+        if (user.isEmpty()) return user.getLeft();
 
-        var user = userRepository.findByToken(token)
-                .onEmpty(() -> log.debug(strings.userNotExists));
-        if (user.isEmpty()) return ResponseWrapper.fail(500, strings.userNotExists);
-
-        var success = userRepository.setAvatarByUserId(user.get().getId(), avatar)
-                .onEmpty(() -> log.debug(strings.avatarSetFail));
-        if (success.isEmpty() || !success.get()) return ResponseWrapper.fail(500, strings.avatarSetFail);
+        var setFail = repositoryWrapper.setAvatar(user.get(), avatar);
+        if (setFail.isDefined()) return setFail.get();
 
         return ResponseEntity.status(200).body(new SuccessResponse("Success"));
     }
@@ -186,10 +136,12 @@ public class LoginController {
     public LoginController(
             UserRepository userRepository,
             PasswordHasher passwordHasher,
-            UserPrimitiveTokensRepository userPrimitiveTokensRepository
-    ) {
+            UserPrimitiveTokensRepository userPrimitiveTokensRepository,
+            Validator validator, RepositoryWrapper repositoryWrapper) {
         this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
+        this.validator = validator;
+        this.repositoryWrapper = repositoryWrapper;
     }
 }

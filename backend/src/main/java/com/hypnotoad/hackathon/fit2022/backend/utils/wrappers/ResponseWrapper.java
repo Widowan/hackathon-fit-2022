@@ -1,5 +1,7 @@
-package com.hypnotoad.hackathon.fit2022.backend.responses;
+package com.hypnotoad.hackathon.fit2022.backend.utils.wrappers;
 
+import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
+import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
