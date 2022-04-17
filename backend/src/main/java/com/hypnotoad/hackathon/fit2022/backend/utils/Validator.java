@@ -2,10 +2,8 @@ package com.hypnotoad.hackathon.fit2022.backend.utils;
 
 import com.hypnotoad.hackathon.fit2022.backend.configurations.Strings;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
-import com.hypnotoad.hackathon.fit2022.backend.users.User;
 import com.hypnotoad.hackathon.fit2022.backend.users.UserRepository;
 import com.hypnotoad.hackathon.fit2022.backend.utils.wrappers.ResponseWrapper;
-import io.vavr.control.Either;
 import io.vavr.control.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,7 +2,6 @@ package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
 import com.hypnotoad.hackathon.fit2022.backend.auth.token.PrimitiveTokensRepository;
 import com.hypnotoad.hackathon.fit2022.backend.configurations.Strings;
-import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.AllGameResultsResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.GameResultResponse;

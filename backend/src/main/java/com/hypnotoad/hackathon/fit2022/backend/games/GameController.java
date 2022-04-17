@@ -1,7 +1,6 @@
 package com.hypnotoad.hackathon.fit2022.backend.games;
 
 import com.hypnotoad.hackathon.fit2022.backend.configurations.Strings;
-import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.responses.game.AllGamesResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.game.GameResponse;
