@@ -1,7 +1,7 @@
 package com.hypnotoad.hackathon.fit2022.backend.utils.wrappers;
 
 import com.hypnotoad.hackathon.fit2022.backend.auth.token.PrimitiveToken;
-import com.hypnotoad.hackathon.fit2022.backend.auth.token.UserPrimitiveTokensRepository;
+import com.hypnotoad.hackathon.fit2022.backend.auth.token.PrimitiveTokensRepository;
 import com.hypnotoad.hackathon.fit2022.backend.configurations.Strings;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.users.User;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserRepoWrapper {
     final UserRepository userRepository;
-    final UserPrimitiveTokensRepository userPrimitiveTokensRepository;
+    final PrimitiveTokensRepository primitiveTokensRepository;
     @Autowired Strings strings;
     static final Logger log = LoggerFactory.getLogger(UserRepoWrapper.class);
 
@@ -28,7 +28,7 @@ public class UserRepoWrapper {
     }
 
     public Either<ResponseEntity<Response>, ? extends PrimitiveToken> createToken(User user) {
-        return userPrimitiveTokensRepository.createToken(user)
+        return primitiveTokensRepository.createToken(user)
                 .onEmpty(() -> log.error(strings.cantCreateToken))
                 .toEither(ResponseWrapper.fail(500, strings.cantCreateToken));
     }
@@ -51,8 +51,8 @@ public class UserRepoWrapper {
 
     public Either<ResponseEntity<Response>, User> userByToken(String token, boolean prolong) {
         var valid = prolong
-                ? userPrimitiveTokensRepository.validateToken(token)
-                : userPrimitiveTokensRepository.validateTokenNoProlong(token);
+                ? primitiveTokensRepository.validateToken(token)
+                : primitiveTokensRepository.validateTokenNoProlong(token);
 
         if (valid.isEmpty()) {
             log.error(strings.somethingWentWrong);
@@ -69,7 +69,7 @@ public class UserRepoWrapper {
     }
 
     public Either<ResponseEntity<Response>, Boolean> deleteToken(User user) {
-        return userPrimitiveTokensRepository.deleteTokenByUser(user)
+        return primitiveTokensRepository.deleteTokenByUser(user)
                 .onEmpty(() -> log.debug(strings.tokenNotDeleted))
                 // We don't care about whether token was ACTUALLY deleted, just that
                 // operation didn't fail, so we ignore the bool value inside of Option
@@ -91,8 +91,8 @@ public class UserRepoWrapper {
         return Option.none();
     }
 
-    public UserRepoWrapper(UserRepository userRepository, UserPrimitiveTokensRepository userPrimitiveTokensRepository) {
+    public UserRepoWrapper(UserRepository userRepository, PrimitiveTokensRepository primitiveTokensRepository) {
         this.userRepository = userRepository;
-        this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
+        this.primitiveTokensRepository = primitiveTokensRepository;
     }
 }

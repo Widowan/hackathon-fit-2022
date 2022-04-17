@@ -1,16 +1,19 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
-import com.hypnotoad.hackathon.fit2022.backend.auth.token.UserPrimitiveTokensRepository;
-import com.hypnotoad.hackathon.fit2022.backend.games.GameRepository;
+import com.hypnotoad.hackathon.fit2022.backend.auth.token.PrimitiveTokensRepository;
+import com.hypnotoad.hackathon.fit2022.backend.configurations.Strings;
 import com.hypnotoad.hackathon.fit2022.backend.responses.FailResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.Response;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.AllGameResultsResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.GameResultResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.GameTotalResultResponse;
 import com.hypnotoad.hackathon.fit2022.backend.responses.gameresults.LeaderboardResponse;
-import com.hypnotoad.hackathon.fit2022.backend.users.UserRepository;
+import com.hypnotoad.hackathon.fit2022.backend.utils.wrappers.GameRepoWrapper;
+import com.hypnotoad.hackathon.fit2022.backend.utils.wrappers.ResponseWrapper;
+import com.hypnotoad.hackathon.fit2022.backend.utils.wrappers.UserRepoWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,51 +21,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class GameResultController {
-    UserRepository userRepository;
-    UserPrimitiveTokensRepository userPrimitiveTokensRepository;
-    GameResultRepository gameResultRepository;
-    GameRepository gameRepository;
+    final UserRepoWrapper userRepoWrapper;
+    final PrimitiveTokensRepository primitiveTokensRepository;
+    final GameResultRepository gameResultRepository;
+    final GameRepoWrapper gameRepoWrapper;
+
+    @Autowired Strings strings;
     static final Logger log = LoggerFactory.getLogger(GameResultController.class);
 
     @GetMapping("/api/getAllGameResultsByUser")
     public ResponseEntity<Response> getAllGameResultsByUser(@RequestParam String token) {
         log.debug("getAllGameResultsByUser issued with token {}", token);
 
-        var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid.get()) {
-            log.debug("Provided token is invalid");
-            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
-        }
+        var user = userRepoWrapper.userByToken(token, true);
+        if (user.isLeft()) return user.getLeft();
 
-        var user = userRepository.findByToken(token);
         var gameResults = gameResultRepository.findAllByUserId(user.get().getId());
-        if (gameResults == null) {
-            log.debug("Found null, expected empty list");
-            return ResponseEntity.status(500).body(new FailResponse("Couldn't access the database"));
-        }
 
         return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
     }
 
-    // Okay this is basically copy-paste already, aspects ASAP
     @GetMapping("/api/getGameResultsByUser")
     public ResponseEntity<Response> getGameResultsByUser(@RequestParam String token, @RequestParam int gameId) {
         log.debug("getGameResultsByUser issued with token {}", token);
 
-        var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid.get()) {
-            log.debug("Provided token is invalid");
-            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
-        }
+        var user = userRepoWrapper.userByToken(token, true);
+        if (user.isLeft()) return user.getLeft();
 
-        var user = userRepository.findByToken(token);
-        var gameResults = gameResultRepository.findAllByUserId(user.get().getId());
-        if (gameResults == null) {
-            log.debug("Found null, expected empty list");
-            return ResponseEntity.status(500).body(new FailResponse("Couldn't access the database"));
-        }
+        var gameResults = gameResultRepository.findAllByUserId(user.get().getId())
+                .filter(g -> g.getGameId() == gameId);
 
-        gameResults = gameResults.stream().filter(gr -> gr.getGameId() == gameId).toList();
         return ResponseEntity.status(200).body(new AllGameResultsResponse(gameResults));
     }
 
@@ -73,61 +61,30 @@ public class GameResultController {
     ) {
         log.debug("addGameResult issued with token {}", token);
 
-        var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid.get()) {
-            log.debug("Provided token is invalid");
-            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
-        }
+        var user = userRepoWrapper.userByToken(token, true);
+        if (user.isLeft()) return user.getLeft();
 
-        var game = gameRepository.findById(gameId);
-        if (game == null) {
-            log.debug("Such game doesn't exists");
-            return ResponseEntity.status(401).body(new FailResponse("Game doesn't exists"));
-        }
+        var game = gameRepoWrapper.gameById(gameId);
+        if (game.isLeft()) return game.getLeft();
 
-        var user = userRepository.findByToken(token);
         var gameResult = gameResultRepository.createGameResult(
                 user.get().getId(), gameId, result, score, timeElapsed);
-        if (gameResult == null) {
-            return ResponseEntity.status(500).body(new FailResponse("Couldn't create database entry"));
-        }
+        if (gameResult.isEmpty()) return ResponseWrapper.fail(500, strings.somethingWentWrong);
 
-        return ResponseEntity.status(200).body(new GameResultResponse(gameResult));
-    }
-
-    public GameResultController(UserRepository userRepository,
-            UserPrimitiveTokensRepository userPrimitiveTokensRepository,
-            GameResultRepository gameResultRepository,
-            GameRepository gameRepository
-    ) {
-        this.gameResultRepository = gameResultRepository;
-        this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
-        this.userRepository = userRepository;
-        this.gameRepository = gameRepository;
+        return ResponseEntity.status(200).body(new GameResultResponse(gameResult.get()));
     }
 
     @GetMapping("/api/getLeaderboard")
     public ResponseEntity<Response> getLeaderboard(@RequestParam String token, @RequestParam int gameId) {
         log.debug("getLeaderboard issued with token {}", token);
 
-        var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid.get()) {
-            log.debug("Provided token is invalid");
-            return  ResponseEntity.status(403).body(new FailResponse("Invalid token"));
-        }
+        var user = userRepoWrapper.userByToken(token, true);
+        if (user.isLeft()) return user.getLeft();
 
-        var game = gameRepository.findById(gameId);
-        if (game == null) {
-            log.debug("Such game doesn't exists");
-            return ResponseEntity.status(401).body(new FailResponse("Game doesn't exists"));
-        }
+        var game = gameRepoWrapper.gameById(gameId);
+        if (game.isLeft()) return game.getLeft();
 
-        var user = userRepository.findByToken(token);
         var leaderboard = gameResultRepository.getLeaderboard(user.get().getId(), gameId);
-        if (leaderboard == null) {
-            log.debug("Expected empty list, got null");
-            return ResponseEntity.status(500).body(new FailResponse("Couldn't connect to database"));
-        }
 
         return ResponseEntity.status(200).body(new LeaderboardResponse(leaderboard));
     }
@@ -138,26 +95,28 @@ public class GameResultController {
             @RequestParam int gameId,
             @RequestParam int days
     ) {
-        var valid = userPrimitiveTokensRepository.validateToken(token);
-        if (!valid.get()) {
-            log.debug("Provided token is invalid");
-            return ResponseEntity.status(403).body(new FailResponse("Invalid token"));
-        }
+        log.debug("getGameTotalResult issued with token {}", token);
 
-        var game = gameRepository.findById(gameId);
-        if (game == null) {
-            log.debug("Such game doesn't exists");
-            return ResponseEntity.status(401).body(new FailResponse("Game doesn't exists"));
-        }
+        var user = userRepoWrapper.userByToken(token, true);
+        if (user.isLeft()) return user.getLeft();
 
-        var user = userRepository.findByToken(token);
+        var game = gameRepoWrapper.gameById(gameId);
+        if (game.isLeft()) return game.getLeft();
+
         var gameResults = gameResultRepository.findGameTotalResultForDays(
                 user.get().getId(), gameId, days);
-        if (gameResults == null) {
-            log.debug("Nothing found");
-            return ResponseEntity.status(401).body(new FailResponse("Nothing found"));
-        }
 
         return ResponseEntity.status(200).body(new GameTotalResultResponse(gameResults));
+    }
+
+    public GameResultController(UserRepoWrapper userRepoWrapper,
+                                PrimitiveTokensRepository primitiveTokensRepository,
+                                GameResultRepository gameResultRepository,
+                                GameRepoWrapper gameRepoWrapper
+    ) {
+        this.gameResultRepository = gameResultRepository;
+        this.primitiveTokensRepository = primitiveTokensRepository;
+        this.userRepoWrapper = userRepoWrapper;
+        this.gameRepoWrapper = gameRepoWrapper;
     }
 }
