@@ -15,11 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RepositoryWrapper {
+public class UserRepoWrapper {
     final UserRepository userRepository;
     final UserPrimitiveTokensRepository userPrimitiveTokensRepository;
     @Autowired Strings strings;
-    static final Logger log = LoggerFactory.getLogger(RepositoryWrapper.class);
+    static final Logger log = LoggerFactory.getLogger(UserRepoWrapper.class);
 
     public Either<ResponseEntity<Response>, User> createUser(String username, String passwordHash) {
         return userRepository.createUser(username, passwordHash)
@@ -91,7 +91,7 @@ public class RepositoryWrapper {
         return Option.none();
     }
 
-    public RepositoryWrapper(UserRepository userRepository, UserPrimitiveTokensRepository userPrimitiveTokensRepository) {
+    public UserRepoWrapper(UserRepository userRepository, UserPrimitiveTokensRepository userPrimitiveTokensRepository) {
         this.userRepository = userRepository;
         this.userPrimitiveTokensRepository = userPrimitiveTokensRepository;
     }

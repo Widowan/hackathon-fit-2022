@@ -31,6 +31,8 @@ public class Strings {
     public String usernameNotUnique;
     @Value("${strings.auth.avatarSetFail}")
     public String avatarSetFail;
+    @Value("${strings.games.gameNotExists}")
+    public String gameNotExists;
     @Value("${strings.general.somethingWentWrong}")
     public String somethingWentWrong;
 }
