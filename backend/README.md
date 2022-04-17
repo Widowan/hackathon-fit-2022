@@ -4,10 +4,14 @@
 
 ### Сборка
 
-Скопируйте файл src/resources/datatsourceSecrets.properties.example без суффикса example
+Скопируйте файл `src/resources/datatsourceSecrets.properties.example` без суффикса example
 (`mv src/resources/datasourceSecrets{.properties.}`)
-и отредактируйте по необходимости вместе с файлом src/resources/application.properties
-```./mvnw clean install```
+и отредактируйте по необходимости вместе с файлом `src/resources/application.properties`
+
+```bash
+./mvnw clean install
+```
+
 Готовый к развертыванию .jar файл будет в target/backend.jar
 
 ### Развертывание
