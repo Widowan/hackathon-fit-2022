@@ -1,8 +1,9 @@
 package com.hypnotoad.hackathon.fit2022.backend.users;
 
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -23,66 +24,56 @@ public class UserRepository {
                 .build();
     }
 
-    public User createUser(String username, String passwordHash) {
+    public Option<User> createUser(String username, String passwordHash) {
         var sql = "INSERT INTO Users(username, password_hash) VALUES (?, ?)";
-        try {
-            jdbc.update(sql, username, passwordHash);
-            return findByUsername(username);
-        } catch (DataAccessException e) {
-            log.error("Couldn't create user", e);
-        }
 
-        return null;
+        return Try.of(() -> jdbc.update(sql, username, passwordHash))
+                .onFailure(e -> log.error("createUser", e))
+                .flatMap(v -> findByUsername(username).toTry())
+                .toOption();
     }
 
-    public User findByUsername(String username) {
+    public Option<User> findByUsername(String username) {
         var sql = "SELECT * FROM Users WHERE username = ?";
 
-        try {
-            return jdbc.queryForObject(sql, userRowMapper, username);
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, userRowMapper, username))
+//                .onFailure(e -> log.error("findByUsername", e))
+                .toOption();
     }
 
-    public User findById(int id) {
+    public Option<User> findById(int id) {
         var sql = "SELECT * FROM Users WHERE id = ?";
 
-        try {
-            return jdbc.queryForObject(sql, userRowMapper, id);
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, userRowMapper, id))
+//                .onFailure(e -> log.error("findById", e))
+                .toOption();
     }
 
-    public User findByToken(String token) {
-        var sql = "SELECT Users.* FROM Users, UserTokens " +
-                "WHERE (UserTokens.token = ? AND Users.id = UserTokens.user_id)";
+    public Option<User> findByToken(String token) {
+        var sql = """
+                SELECT Users.* FROM Users, UserTokens
+                WHERE (UserTokens.token = ? AND Users.id = UserTokens.user_id)""";
 
-        try {
-            return jdbc.queryForObject(sql, userRowMapper, token);
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, userRowMapper, token))
+//                .onFailure(e -> log.error("findByToken", e))
+                .toOption();
     }
 
-    public boolean validatePasswordHashByUsername(String username, String passwordHash) {
+    public Option<Boolean> validatePasswordHashByUsername(String username, String passwordHash) {
         var sql = "SELECT password_hash FROM Users WHERE username = ?";
 
-        try {
-            return passwordHash.equals(jdbc.queryForObject(sql, String.class, username));
-        } catch (DataAccessException ignored) {}
-
-        return false;
+        return Try.of(() -> jdbc.queryForObject(sql, String.class, username))
+//                .onFailure(e -> log.error("validatePasswordHashByUsername", e))
+                .map(passwordHash::equals)
+                .toOption();
     }
 
-    public boolean setAvatarByUserId(int id, String avatar) {
+    public Option<Boolean> setAvatarByUserId(int id, String avatar) {
         var sql = "UPDATE Users SET avatar = '?' WHERE id = ?";
 
-        try {
-            return jdbc.update(sql, avatar, id) > 0;
-        } catch (DataAccessException ignored) {}
-
-        return false;
+        return Try.of(() -> jdbc.update(sql, avatar, id))
+                .onFailure(e -> log.error("setAvatarById", e))
+                .map(u -> u > 0)
+                .toOption();
     }
 }

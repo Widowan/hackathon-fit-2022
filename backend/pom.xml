@@ -17,11 +17,24 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<!--Vavr-->
+		<dependency>
+			<groupId>io.vavr</groupId>
+			<artifactId>vavr</artifactId>
+			<version>1.0.0-alpha-4</version>
+		</dependency>
+		<!--Immutables-->
 		<dependency>
 			<groupId>org.immutables</groupId>
 			<artifactId>value</artifactId>
 			<version>2.9.0</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.immutables.vavr</groupId>
+			<artifactId>vavr</artifactId>
+			<version>0.6.2</version>
+			<type>pom</type>
 		</dependency>
 		<!--Postgres-->
 		<dependency>
@@ -51,6 +64,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.1</version>
+				<configuration>
+					<compilerArgument>-Xlint:all</compilerArgument>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

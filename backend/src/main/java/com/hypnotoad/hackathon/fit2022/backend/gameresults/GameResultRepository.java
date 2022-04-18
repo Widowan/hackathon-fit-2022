@@ -1,13 +1,14 @@
 package com.hypnotoad.hackathon.fit2022.backend.gameresults;
 
+import io.vavr.collection.List;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public class GameResultRepository {
@@ -17,37 +18,27 @@ public class GameResultRepository {
     private final RowMapper<GameTotalResult> totalResultRowMapper;
     private final static Logger log = LoggerFactory.getLogger(GameResultRepository.class);
 
-    public GameResult findById(int id) {
+    public Option<GameResult> findById(int id) {
         var sql = "SELECT * FROM GameResults WHERE id = ?";
-
-        try {
-            return jdbc.queryForObject(sql, gameResultRowMapper, id);
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, gameResultRowMapper, id))
+                .toOption();
     }
 
     public List<GameResult> findAllByUserId(int userId) {
         var sql = "SELECT * FROM GameResults WHERE user_id = ?";
-        try {
-            return jdbc.query(sql, gameResultRowMapper, userId);
-        } catch (DataAccessException e) {
-            log.error("Couldn't access database: ", e);
-        }
-
-        return null;
+        return Try.of(() -> jdbc.query(sql, gameResultRowMapper, userId))
+                .onFailure(e -> log.error("findAllByUserId", e))
+                .map(List::ofAll)
+                .getOrElse(List::empty);
     }
 
-    public GameResult findLast() {
+    public Option<GameResult> findLast() {
         var sql = "SELECT * FROM GameResults ORDER BY id DESC LIMIT 1";
-        try {
-            return jdbc.queryForObject(sql, gameResultRowMapper);
-        } catch (DataAccessException ignored) {}
-
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, gameResultRowMapper))
+                .toOption();
     }
 
-    public GameResult createGameResult(int userId, int gameId,
+    public Option<GameResult> createGameResult(int userId, int gameId,
             boolean result, int score, float timeElapsed
     ) {
         var sql = """
@@ -56,18 +47,14 @@ public class GameResultRepository {
                 VALUES
                     (?, ?, ?, ?, ?)""";
 
-        try {
-            var upd = jdbc.update(sql, userId, gameId, result, score, timeElapsed);
-            if (upd == 0) {
-                log.error("Couldn't insert to database - 0 updated");
-                return null;
-            }
-            return findLast();
-        } catch (DataAccessException e) {
-            log.error("Couldn't insert to database - data access exception", e);
-        }
-
-        return null;
+        return Try.of(() -> jdbc.update(sql, userId, gameId, result, score, timeElapsed))
+                .onFailure(e -> log.error("createGameResult", e))
+                .filterTry(
+                        u  -> u > 0,
+                        () -> new DataRetrievalFailureException("Zero records updated")
+                )
+                .flatMap(z -> findLast().toTry())
+                .toOption();
     }
 
     public List<LeaderboardRow> getLeaderboard(int userId, int gameId) {
@@ -107,13 +94,11 @@ public class GameResultRepository {
                     place
                 ;
                 """;
-        try {
-            return jdbc.query(sql, leaderboardRowRowMapper, gameId, userId);
-        } catch (DataAccessException e) {
-            log.error("Couldn't access database during leaderboard creation", e);
-        }
 
-        return null;
+        return Try.of(() -> jdbc.query(sql, leaderboardRowRowMapper, gameId, userId))
+                .onFailure(e -> log.error("getLeaderboard", e))
+                .map(List::ofAll)
+                .getOrElse(List::empty);
     }
 
     public GameTotalResult findGameTotalResultForDays(int userId, int gameId, int days) {
@@ -135,12 +120,15 @@ public class GameResultRepository {
                 GROUP BY user_id, game_id
                 HAVING user_id = ? AND game_id = ?
                 """;
-        try {
-            return jdbc.queryForObject(sql, totalResultRowMapper,
-            days*24*60*60, userId, gameId);
-        } catch (DataAccessException ignored) {}
 
-        return null;
+        return Try.of(() -> jdbc.queryForObject(sql, totalResultRowMapper,
+                days*24*60*60, userId, gameId))
+                .toOption()
+                .getOrElse(ImmutableGameTotalResult.builder()
+                        .userId(userId)
+                        .gameId(gameId)
+                        .sumScore(0)
+                        .build());
     }
 
     public GameResultRepository(JdbcTemplate jdbc) {

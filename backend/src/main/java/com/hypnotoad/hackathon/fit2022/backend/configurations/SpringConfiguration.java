@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @PropertySource("classpath:datasourceSecrets.properties")
+@PropertySource("classpath:strings.properties")
 public class SpringConfiguration {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -38,5 +39,11 @@ public class SpringConfiguration {
     @Bean
     public String staticUrl(String hackathonUrl, String staticPath) {
         return hackathonUrl + staticPath;
+    }
+
+    @Bean
+    @Value("${auth.tokenLen}")
+    public int tokenLen(int tokenLen) {
+        return tokenLen;
     }
 }
